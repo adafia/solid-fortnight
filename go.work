@@ -1,0 +1,12 @@
+go 1.25.0
+
+use (
+	./apps/analytics
+	./apps/evaluator
+	./apps/gateway
+	./apps/management
+	./apps/streamer
+	./internal/engine
+	./internal/protocol
+	./internal/storage
+)

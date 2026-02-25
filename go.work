@@ -6,6 +6,7 @@ use (
 	./apps/gateway
 	./apps/management
 	./apps/streamer
+	./internal/config
 	./internal/engine
 	./internal/protocol
 	./internal/storage

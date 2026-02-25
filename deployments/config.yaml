@@ -1,0 +1,25 @@
+log:
+  level: "info"
+  format: "json"
+
+storage:
+  type: "postgres"
+  postgres:
+    host: "localhost"
+    port: 5432
+    user: "${DB_USER}"
+    password: "${DB_PASSWORD}"
+    dbname: "solid_fortnight"
+    sslmode: "disable"
+
+services:
+  gateway:
+    port: 8080
+  analytics:
+    port: 8081
+  evaluator:
+    port: 8082
+  management:
+    port: 8083
+  streamer:
+    port: 8084

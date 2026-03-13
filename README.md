@@ -1,4 +1,8 @@
-# Solid Fortnight
+# Solid Fortnight [WIP]
+
+> **⚠️ Warning:** This project is in its early stages of development and is **not ready for use**. It is a work in progress; expect frequent breaking changes and incomplete features.
+
+*Name suggested by GitHub during repository creation.*
 
 Solid Fortnight is a feature flagging system designed to provide dynamic control over application features. It allows developers to roll out new features to a subset of users, perform A/B testing, and quickly toggle features on or off without deploying new code.
 

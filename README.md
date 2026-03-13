@@ -8,23 +8,55 @@ Solid Fortnight is a feature flagging system designed to provide dynamic control
 
 ## Getting Started
 
+To get started with Solid Fortnight, follow these steps:
+
+1. **Prerequisites**: Ensure you have Go (1.25.0+), Docker, and Docker Compose installed.
+2. **Environment Setup**:
+   - Copy the example environment file: `cp .env.example .env`
+   - Edit `.env` to set your local database credentials.
+   - Load the variables into your current shell: `source ./scripts/load_env.sh`
+3. **Database**: Start the PostgreSQL database:
+   ```bash
+   make start-db
+   ```
+4. **Run the Application**: Start the management service:
+   ```bash
+   make run-app
+   ```
+
 ## Project Structure
 
 The project is organized into several key directories:
 
-- **`apps/`**: Contains individual microservices for different functionalities (e.g., `analytics`, `evaluator`, `gateway`, `management`, `streamer`).
-- **`cmd/`**: Houses the main executable commands, such as the `dashboard`.
-- **`deployments/`**: Stores configuration files for deployment, including `config.yaml` and `docker-compose.yml`.
-- **`docs/`**: Documentation files.
-- **`internal/`**: Internal libraries and packages used across the project, including `config`, `engine`, `protocol`, and `storage`.
-- **`scripts/`**: Various utility scripts for tasks like creating, deleting, getting, and updating flags.
-- **`sdk/`**: Software Development Kits for different languages/platforms (e.g., `client-js`, `server-go`, `server-python`).
+- **`apps/`**: Contains individual microservices (e.g., `management`).
+- **`deployments/`**: Stores configuration files like `config.yaml` and `docker-compose.yml`.
+- **`internal/`**: Shared internal libraries (config, storage, etc.).
+- **`scripts/`**: Utility scripts for environment management and API testing.
 
 ## Running the Application
 
-More detailed instructions for setting up and running the application will be provided here. This typically involves:
+### 1. Database
+The application requires a PostgreSQL database. The provided `docker-compose.yml` sets up a database named `solid_fortnight`.
 
-1. **Prerequisites**: Go, Docker, etc.
-2. **Building**: Instructions to build the various services.
-3. **Configuration**: How to set up necessary environment variables or configuration files.
-4. **Running Services**: Commands to start the individual `apps` services and the `dashboard`.
+```bash
+make start-db
+```
+
+### 2. Configuration
+The application uses `deployments/config.yaml` for configuration. Environment variables in this file (like `${DB_USER}`) are expanded at runtime using the values from your `.env` file.
+
+### 3. Management Service
+The management service handles flag creation and management. To run it:
+
+```bash
+make run-app
+```
+
+### 4. API Tests
+This project uses **Bruno** for API testing. The collection is located in the `bruno/` directory.
+
+1.  Open **Bruno**.
+2.  Click **Open Collection** and select the `bruno/` folder.
+3.  Select the **Local** environment from the environment dropdown.
+4.  Use the **Create Project** request to create your first project.
+5.  Copy the `id` from the response and use it in the **Create Flag** request.

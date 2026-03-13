@@ -26,9 +26,13 @@ var (
 
 func TestMain(m *testing.M) {
 	// Load configuration
-	cfg, err := config.Load("../../deployments/config.yaml")
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "../../../deployments/config.yaml"
+	}
+	cfg, err := config.Load(configPath)
 	if err != nil {
-		panic("Failed to load configuration: " + err.Error())
+		panic("Failed to load configuration from " + configPath + ": " + err.Error())
 	}
 
 	// Connect to the database
@@ -45,8 +49,12 @@ func TestMain(m *testing.M) {
 	}
 
 	// Run migrations
-	if err := db.Migrate(testDB, "../../internal/storage/migrations"); err != nil {
-		panic("Failed to run migrations: " + err.Error())
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+	if migrationsPath == "" {
+		migrationsPath = "../../../internal/storage/migrations"
+	}
+	if err := db.Migrate(testDB, migrationsPath); err != nil {
+		panic("Failed to run migrations from " + migrationsPath + ": " + err.Error())
 	}
 
 	// Set up stores and handlers

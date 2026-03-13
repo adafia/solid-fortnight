@@ -24,22 +24,4 @@ run-app:
 #  API TESTS
 # ====================================================================================
 
-# Usage: make test-api-create project_id=<your-project-id>
-test-api-create:
-	@echo "Creating a new flag..."
-	@./scripts/create_flag.sh $(project_id)
-
-# Usage: make test-api-get flag_id=<your-flag-id>
-test-api-get:
-	@echo "Getting flag with ID $(flag_id)..."
-	@./scripts/get_flag.sh $(flag_id)
-
-# Usage: make test-api-update project_id=<your-project-id> flag_id=<your-flag-id>
-test-api-update:
-	@echo "Updating flag with ID $(flag_id)..."
-	@./scripts/update_flag.sh $(project_id) $(flag_id)
-
-# Usage: make test-api-delete flag_id=<your-flag-id>
-test-api-delete:
-	@echo "Deleting flag with ID $(flag_id)..."
-	@./scripts/delete_flag.sh $(flag_id)
+# Use the Bruno collection in the /bruno directory to test the API.

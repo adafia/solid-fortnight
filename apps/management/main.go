@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/adafia/solid-fortnight/apps/management/handlers"
 	"github.com/adafia/solid-fortnight/internal/config"
@@ -13,9 +14,13 @@ import (
 
 func main() {
 	// Load configuration
-	cfg, err := config.Load("../../deployments/config.yaml")
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "deployments/config.yaml"
+	}
+	cfg, err := config.Load(configPath)
 	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+		log.Fatalf("Failed to load configuration from %s: %v", configPath, err)
 	}
 
 	// Connect to the database
@@ -32,19 +37,26 @@ func main() {
 	}
 
 	// Run migrations
-	if err := db.Migrate(database, "../../internal/storage/migrations"); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+	if migrationsPath == "" {
+		migrationsPath = "internal/storage/migrations"
+	}
+	if err := db.Migrate(database, migrationsPath); err != nil {
+		log.Fatalf("Failed to run migrations from %s: %v", migrationsPath, err)
 	}
 
 	// Set up stores
 	flagStore := store.NewFlagStore(database)
+	projectStore := store.NewProjectStore(database)
 
 	// Set up handlers
 	flagsHandler := handlers.NewFlagsHandler(flagStore)
+	projectsHandler := handlers.NewProjectsHandler(projectStore)
 
 	// Set up router
 	mux := http.NewServeMux()
 	mux.Handle("/flags/", flagsHandler)
+	mux.Handle("/projects/", projectsHandler)
 
 	// Start server
 	port := cfg.Services["management"].Port

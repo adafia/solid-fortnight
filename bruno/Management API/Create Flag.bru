@@ -1,0 +1,25 @@
+meta {
+  name: Create Flag
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/flags/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "project_id": "e194849c-ca67-415f-8809-372039d98c53",
+    "key": "new-feature",
+    "name": "New Feature Flag",
+    "description": "Enables the new experimental feature",
+    "type": "boolean"
+  }
+}
+
+vars:pre-request {
+  base_url: http://localhost:8083
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Update Flag
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/flags/REPLACE_WITH_FLAG_ID
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Updated Flag Name",
+    "description": "Updated description",
+    "type": "boolean"
+  }
+}

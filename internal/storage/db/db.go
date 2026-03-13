@@ -31,6 +31,7 @@ func NewDB(dsn string) (*sql.DB, error) {
 
 // Migrate runs the database migrations.
 func Migrate(db *sql.DB, migrationsPath string) error {
+	log.Printf("Running migrations from path: %s", migrationsPath)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		return err
@@ -43,10 +44,24 @@ func Migrate(db *sql.DB, migrationsPath string) error {
 		return err
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	version, dirty, err := m.Version()
+	if err != nil && err != migrate.ErrNilVersion {
+		log.Printf("Failed to get migration version: %v", err)
+		return err
+	}
+	log.Printf("Current migration version: %v, dirty: %v", version, dirty)
+
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		log.Printf("Migration failed: %v", err)
 		return err
 	}
 
-	log.Println("Migrations applied successfully")
+	if err == migrate.ErrNoChange {
+		log.Println("No new migrations to apply")
+	} else {
+		newVersion, _, _ := m.Version()
+		log.Printf("Migrations applied successfully. New version: %v", newVersion)
+	}
 	return nil
 }

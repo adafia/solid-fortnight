@@ -23,8 +23,8 @@ type LogConfig struct {
 // StorageConfig holds the configuration for the storage backend.
 type StorageConfig struct {
 	Type     string         `json:"type" yaml:"type"` // e.g., "postgres", "mysql", "memory"
-	Postgres PostgresConfig `json:"postgres,omitempty" yaml:"postgres,omitempty"`
-	MySQL    MySQLConfig    `json:"mysql,omitempty" yaml:"mysql,omitempty"`
+	Postgres PostgresConfig `json:"postgres,omitzero" yaml:"postgres,omitempty"`
+	MySQL    MySQLConfig    `json:"mysql,omitzero" yaml:"mysql,omitempty"`
 }
 
 // PostgresConfig holds PostgreSQL connection details.
@@ -52,16 +52,16 @@ type ServiceConfig struct {
 	// Other service-specific settings can be added here.
 }
 
-// Load loads the configuration from a YAML file.
 func Load(path string) (*Config, error) {
-	f, err := os.Open(path)
+	content, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file: %w", err)
+		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
-	defer f.Close()
+
+	expandedContent := os.ExpandEnv(string(content))
 
 	var cfg Config
-	if err := yaml.NewDecoder(f).Decode(&cfg); err != nil {
+	if err := yaml.Unmarshal([]byte(expandedContent), &cfg); err != nil {
 		return nil, fmt.Errorf("failed to decode config: %w", err)
 	}
 

@@ -12,7 +12,7 @@ post {
 
 body:json {
   {
-    "project_id": "e194849c-ca67-415f-8809-372039d98c53",
+    "project_id": "{{project_id}}",
     "key": "new-feature",
     "name": "New Feature Flag",
     "description": "Enables the new experimental feature",
@@ -20,6 +20,8 @@ body:json {
   }
 }
 
-vars:pre-request {
-  base_url: http://localhost:8083
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("flag_id", res.body.id);
+  }
 }

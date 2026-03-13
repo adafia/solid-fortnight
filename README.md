@@ -46,10 +46,16 @@ make start-db
 The application uses `deployments/config.yaml` for configuration. Environment variables in this file (like `${DB_USER}`) are expanded at runtime using the values from your `.env` file.
 
 ### 3. Management Service
-The management service handles flag creation and management. To run it:
+The management service handles flag creation and management.
 
+**Run locally (Go):**
 ```bash
 make run-app
+```
+
+**Run with Docker Compose:**
+```bash
+make start-all
 ```
 
 ### 4. API Tests

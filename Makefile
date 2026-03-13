@@ -6,10 +6,18 @@
 
 start-db:
 	@echo "Starting PostgreSQL database..."
-	@docker-compose -f deployments/docker-compose.yml up -d
+	@docker-compose -f deployments/docker-compose.yml up -d postgres
 
 stop-db:
 	@echo "Stopping PostgreSQL database..."
+	@docker-compose -f deployments/docker-compose.yml stop postgres
+
+start-all:
+	@echo "Starting the entire application with Docker Compose..."
+	@docker-compose -f deployments/docker-compose.yml up -d
+
+stop-all:
+	@echo "Stopping the entire application with Docker Compose..."
 	@docker-compose -f deployments/docker-compose.yml down
 
 # ====================================================================================

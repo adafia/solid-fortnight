@@ -6,10 +6,10 @@ storage:
   type: "postgres"
   postgres:
     host: "${POSTGRES_HOST}"
-    port: 5432
+    port: ${POSTGRES_PORT}
     user: "${DB_USER}"
     password: "${DB_PASSWORD}"
-    dbname: "solid_fortnight"
+    dbname: "${DB_NAME}"
     sslmode: "disable"
 
 services:

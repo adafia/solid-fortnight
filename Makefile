@@ -14,7 +14,7 @@ stop-db:
 
 start-all:
 	@echo "Starting the entire application with Docker Compose..."
-	@docker-compose -f deployments/docker-compose.yml up -d
+	@docker-compose -f deployments/docker-compose.yml up -d --build
 
 stop-all:
 	@echo "Stopping the entire application with Docker Compose..."

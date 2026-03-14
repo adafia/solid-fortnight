@@ -26,8 +26,7 @@ services:
     environment:
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-password}
-      # Point to the container's postgres host
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
     depends_on:
       postgres:
         condition: service_healthy

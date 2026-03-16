@@ -64,8 +64,8 @@ A production-ready feature flag service that enables development teams to safely
 
 #### Evaluation Endpoints
 
-- Single flag evaluation: `GET /api/v1/flags/{flagKey}/evaluate`
-- Bulk evaluation: `POST /api/v1/flags/evaluate` (returns all flags for a context)
+- Single flag evaluation: `POST /api/v1/evaluate` (returns variation for a context) [IMPLEMENTED]
+- Bulk evaluation: `POST /api/v1/flags/evaluate` (returns all flags for a context) [PLANNED]
 - Server-side SDKs can cache and evaluate locally after initial sync
 
 #### Evaluation Context
@@ -133,9 +133,9 @@ A production-ready feature flag service that enables development teams to safely
 
 ### Data Consistency
 
-- Eventual consistency for flag configuration propagation (acceptable delay: <100ms)
-- Strong consistency for flag CRUD operations
-- Real-time updates via WebSocket or Server-Sent Events (SSE)
+- Eventual consistency for flag configuration propagation (acceptable delay: <100ms) [IMPLEMENTED]
+- Strong consistency for flag CRUD operations [IMPLEMENTED]
+- Real-time updates via Server-Sent Events (SSE) [IMPLEMENTED]
 
 ---
 
@@ -143,23 +143,23 @@ A production-ready feature flag service that enables development teams to safely
 
 ### Core Components
 
-| Component | Description |
-| ----------- | ------------- |
-| **API Gateway** | Entry point for all requests. Handles authentication, rate limiting, request routing. |
-| **Evaluation Service** | Core service that evaluates flags based on targeting rules. Optimized for low latency. |
-| **Management Service** | Handles CRUD operations for flags, environments, and rules. Publishes change events. |
-| **Analytics Service** | Ingests evaluation events, computes metrics, powers dashboard analytics. |
-| **Stream Service** | Manages WebSocket/SSE connections for real-time flag updates to SDKs. |
-| **Admin Dashboard** | React-based web UI for managing flags and viewing analytics. |
+| Component | Status | Description |
+| ----------- | ------- | ------------- |
+| **API Gateway** | [PLANNED] | Entry point for all requests. Handles authentication, rate limiting. |
+| **Evaluation Service** | [IMPLEMENTED] | Core service that evaluates flags based on targeting rules. |
+| **Management Service** | [IMPLEMENTED] | Handles CRUD operations for flags, environments, and rules. |
+| **Analytics Service** | [PLANNED] | Ingests evaluation events, computes metrics, powers dashboard. |
+| **Stream Service** | [IMPLEMENTED] | Manages SSE connections for real-time flag updates to SDKs. |
+| **Admin Dashboard** | [PLANNED] | React-based web UI for managing flags and viewing analytics. |
 
 ### Data Storage
 
-| Store | Purpose |
-| ------- | --------- |
-| **PostgreSQL** | Primary database for flag configurations, targeting rules, audit logs. |
-| **Redis** | In-memory cache for flag data, session management, rate limiting. |
-| **TimescaleDB** | Time-series database for analytics events and metrics (built on PostgreSQL). |
-| **Message Queue** | Redis Streams or RabbitMQ for async event processing and change notifications. |
+| Store | Purpose | Status |
+| ------- | --------- | ------- |
+| **PostgreSQL** | Primary database for configurations, targeting rules, logs. | [IMPLEMENTED] |
+| **Redis** | Pub/Sub messaging and shared configuration. | [IMPLEMENTED] |
+| **TimescaleDB** | Time-series database for analytics events and metrics. | [PLANNED] |
+| **Message Queue** | Redis for change notifications and async processing. | [IMPLEMENTED] |
 
 ### Technology Stack (Recommended)
 

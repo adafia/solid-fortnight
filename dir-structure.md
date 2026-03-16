@@ -4,21 +4,22 @@
 /solid-fortnight
 ├── go.work                # Orchestrates all modules
 ├── apps/
-│   ├── gateway/           # Gin/Echo - Auth & Rate Limiting
-│   ├── management/        # Gorm - CRUD for Flags/Rules
-│   ├── evaluator/         # High-perf Rule Engine (GRPC/Internal)
-│   ├── streamer/          # Gorilla WebSocket / SSE
-│   └── analytics/         # Worker to process MQ -> TimescaleDB
+│   ├── gateway/           # (Planned) Auth & Rate Limiting
+│   ├── management/        # CRUD for Flags/Rules (Gin/HTTP)
+│   ├── evaluator/         # High-perf Rule Engine (HTTP)
+│   ├── streamer/          # SSE broadcast service
+│   └── analytics/         # (Planned) Ingest metrics -> DB
 ├── cmd/
-│   └── dashboard/         # React/Vite Frontend
+│   └── dashboard/         # (Planned) React/Vite Frontend
 ├── sdk/
-│   ├── client-js/         # (Stay in JS/TS)
-│   ├── server-go/         # Go SDK for other internal apps
-│   └── server-python/     # Python SDK (FFI or RPC)
-├── internal/              # Code that cannot be imported externally
-│   ├── protocol/          # Protobuf / Shared Event Definitions
-│   ├── engine/            # The actual logic that calculates toggles
-│   └── storage/           # Shared DB drivers (Postgres/Redis)
-├── deployments/           # Dockerfiles & K8s manifests
-└── scripts/               # Migration and Seed scripts
+│   ├── client-js/         # (WIP) Browser SDK
+│   ├── server-go/         # (WIP) Go SDK for server-side evaluation
+│   └── server-python/     # (Planned) Python SDK
+├── internal/              # Shared internal packages
+│   ├── engine/            # Rule evaluation logic
+│   ├── storage/           # Shared DB drivers (Postgres/Redis/PubSub)
+│   └── config/            # YAML configuration loader
+├── deployments/           # Dockerfiles & Compose manifests
+├── docs/                  # Detailed service documentation
+└── scripts/               # Utility scripts and test tools
 ```

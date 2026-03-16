@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented **Delta Updates via SSE** in the Streamer service and SDKs (`client-js`, `server-go`) to update local cache selectively without refetching all flags on every change.
 - Implemented **Analytics Background Worker** (`apps/analytics/service/worker.go`) to consume evaluation events from Redis Streams.
 - Implemented **PostgreSQL Persistence** for evaluation events in the Analytics service using batch insertions.
 - Added **Performance Benchmarks** for the core evaluation engine (`internal/engine/engine_test.go`).
@@ -47,6 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Modified `apps/management` to publish full flag configurations on updates.
+- Modified `apps/streamer` to broadcast the JSON payload instead of a generic `"update"` event.
+- Modified SDKs (`sdk/client-js`, `sdk/server-go`) to apply delta updates directly to local cache without an HTTP request.
+- Updated `docs/streamer-service.md` to reflect the new delta update JSON payload format.
 - Updated `FlagsHandler` in Management API to publish environment updates on flag configuration changes.
 - Enhanced `Makefile` to include Redis and the new services in `start-db` and `stop-db`.
 - Separated project and environment management logic in `apps/management/handlers/projects.go`.
@@ -58,4 +63,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Resolved an `EventSource` mocking issue in `sdk/client-js` tests by dynamically resolving the implementation, allowing SSE delta updates to be tested properly.
 - Resolved a database insertion failure in environment tests caused by an invalid UUID in the `CreatedBy` field.

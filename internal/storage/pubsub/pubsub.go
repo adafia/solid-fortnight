@@ -8,7 +8,8 @@ import (
 )
 
 type EnvironmentUpdate struct {
-	EnvironmentID string `json:"environment_id"`
+	EnvironmentID string      `json:"environment_id"`
+	Data          interface{} `json:"data,omitempty"`
 }
 
 type Publisher struct {
@@ -19,8 +20,11 @@ func NewPublisher(rdb *redis.Client) *Publisher {
 	return &Publisher{rdb: rdb}
 }
 
-func (p *Publisher) PublishEnvironmentUpdate(ctx context.Context, envID string) error {
-	payload, err := json.Marshal(EnvironmentUpdate{EnvironmentID: envID})
+func (p *Publisher) PublishEnvironmentUpdate(ctx context.Context, envID string, data interface{}) error {
+	payload, err := json.Marshal(EnvironmentUpdate{
+		EnvironmentID: envID,
+		Data:          data,
+	})
 	if err != nil {
 		return err
 	}

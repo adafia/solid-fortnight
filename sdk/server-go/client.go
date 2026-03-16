@@ -151,10 +151,28 @@ func (c *Client) connectStream(url string) error {
 		}
 
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "data: update") {
-			log.Println("Received update event from streamer, fetching flags...")
-			if err := c.fetchFlags(); err != nil {
-				log.Printf("Failed to fetch flags after update: %v", err)
+		if strings.HasPrefix(line, "data: ") {
+			data := strings.TrimPrefix(line, "data: ")
+			if data == "update" {
+				log.Println("Received generic update event, fetching all flags...")
+				_ = c.fetchFlags()
+				continue
+			}
+
+			// Try to parse as JSON with data
+			var payload struct {
+				EnvironmentID string            `json:"environment_id"`
+				Data          engine.FlagConfig `json:"data"`
+			}
+			if err := json.Unmarshal([]byte(data), &payload); err == nil && payload.Data.Key != "" {
+				log.Printf("Received delta update for flag: %s", payload.Data.Key)
+				c.mu.Lock()
+				c.flags[payload.Data.Key] = payload.Data
+				c.mu.Unlock()
+			} else {
+				// Fallback to full fetch if we can't parse or it's not a single flag update
+				log.Println("Received unknown update format, fetching all flags...")
+				_ = c.fetchFlags()
 			}
 		}
 	}

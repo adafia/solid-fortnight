@@ -9,9 +9,9 @@ The service uses **Server-Sent Events (SSE)** to push updates to connected clien
 ### Flow of Events
 
 1. **Change Trigger**: A user updates a flag configuration or variation via the Management API.
-2. **Publish**: The Management API publishes an `environment_update` message to Redis on the `environment_updates` channel.
+2. **Publish**: The Management API publishes an `environment_update` message to Redis on the `environment_updates` channel. This message includes the updated flag configuration.
 3. **Subscribe**: The Streamer service is subscribed to this Redis channel.
-4. **Broadcast**: Upon receiving the message, the Streamer identifies all clients currently connected to that specific `environment_id` and broadcasts an `update` event to them via their SSE connection.
+4. **Broadcast**: Upon receiving the message, the Streamer identifies all clients currently connected to that specific `environment_id` and broadcasts the JSON payload directly via their SSE connection.
 
 ## API Specification
 
@@ -33,9 +33,15 @@ Establish a persistent SSE connection to receive updates for a specific environm
 
 **Message Format:**
 
-The service sends simple text messages prefixed with `data:`.
+The service sends JSON messages prefixed with `data:`.
 
-- **Update Event**: `data: update\n\n`
+- **Delta Update Event**:
+
+  ```json
+  data: {"environment_id": "uuid", "data": {"key": "flag-key", "enabled": true, ...}}\n\n
+  ```
+  
+- **Generic Update Event (Fallback)**: `data: update\n\n`
 - **Keep-alive (Heartbeat)**: `: keep-alive\n\n` (Sent every 30 seconds to maintain the connection).
 
 ## Implementation Details

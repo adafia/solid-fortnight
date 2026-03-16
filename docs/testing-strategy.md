@@ -15,11 +15,13 @@ The project uses a multi-layered testing approach to ensure reliability and main
 To prevent tests from interfering with development data, a dedicated test environment is used via Docker Compose.
 
 ### Development Environment
+
 * **PostgreSQL:** `localhost:5432` (DB: `solid_fortnight`)
 * **Redis:** `localhost:6379`
 * **Command:** `make start-db`
 
 ### Testing Environment
+
 * **PostgreSQL:** `localhost:5433` (DB: `solid_fortnight_test`)
 * **Redis:** `localhost:6380`
 * **Command:** `make test`
@@ -27,16 +29,22 @@ To prevent tests from interfering with development data, a dedicated test enviro
 ## 3. Testing Patterns
 
 ### Integration Testing (Synchronous)
+
 Used for the Management API. These tests ensure that HTTP requests correctly modify the PostgreSQL state.
+
 * **Workflow:** Setup DB -> Run Migration -> Execute Request -> Verify DB State -> Truncate Tables.
 
 ### Asynchronous Testing (Worker Pattern)
+
 Used for the Analytics service. Testing the flow from the Ingestion API to Redis Streams and finally to PostgreSQL.
+
 * **Pattern:** "Poll with Timeout". The test produces an event and then polls the database in a loop (with a timeout) until the expected record appears.
 * **Example:** See `apps/analytics/handlers/analytics_integration_test.go`.
 
 ### Performance Benchmarking
+
 Critical for the `internal/engine` package to ensure flag evaluation remains in the sub-millisecond range.
+
 * **Command:** `go test -bench=. ./internal/engine`
 
 ## 4. Mocking Strategy
@@ -47,11 +55,13 @@ Critical for the `internal/engine` package to ensure flag evaluation remains in 
 ## 5. Running Tests
 
 ### All Tests
+
 ```bash
 make test
 ```
 
 ### Specific Service Tests
+
 ```bash
 # Start test containers
 make test-db-up

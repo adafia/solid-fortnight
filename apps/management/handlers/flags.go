@@ -176,9 +176,10 @@ func (h *FlagsHandler) UpsertFlagEnvironment(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Publish update
-	if h.publisher != nil {
-		h.publisher.PublishEnvironmentUpdate(r.Context(), envID)
+	// Fetch full config to publish
+	fullFe, err := h.configStore.GetFlagEnvironment(flagID, envID)
+	if err == nil && h.publisher != nil {
+		h.publisher.PublishEnvironmentUpdate(r.Context(), envID, fullFe)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -193,6 +194,7 @@ func (h *FlagsHandler) AddVariation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// We need the flagID and envID from the path to publish an update for that environment
+	flagID := parts[1]
 	envID := parts[3]
 	
 	var v store.Variation
@@ -206,9 +208,10 @@ func (h *FlagsHandler) AddVariation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Publish update
-	if h.publisher != nil {
-		h.publisher.PublishEnvironmentUpdate(r.Context(), envID)
+	// Publish full update
+	fullFe, err := h.configStore.GetFlagEnvironment(flagID, envID)
+	if err == nil && h.publisher != nil {
+		h.publisher.PublishEnvironmentUpdate(r.Context(), envID, fullFe)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

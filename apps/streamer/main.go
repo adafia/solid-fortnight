@@ -96,7 +96,8 @@ func main() {
 			}
 
 			var payload struct {
-				EnvironmentID string `json:"environment_id"`
+				EnvironmentID string      `json:"environment_id"`
+				Data          interface{} `json:"data"`
 			}
 			if err := json.Unmarshal([]byte(msg.Payload), &payload); err != nil {
 				log.Printf("Failed to unmarshal Redis message: %v", err)
@@ -104,7 +105,7 @@ func main() {
 			}
 
 			log.Printf("Received update for environment: %s", payload.EnvironmentID)
-			hub.Broadcast(payload.EnvironmentID, "update")
+			hub.Broadcast(payload.EnvironmentID, msg.Payload)
 		}
 	}()
 

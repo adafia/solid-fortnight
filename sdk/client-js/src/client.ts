@@ -1,4 +1,4 @@
-import { EventSource } from "eventsource";
+import { EventSource as PolyfillES } from "eventsource";
 import { Evaluator } from "./engine";
 import type {
   FlagConfig,
@@ -17,7 +17,7 @@ export class Client {
   private config: Config;
   private evaluator: Evaluator;
   private flags: Map<string, FlagConfig> = new Map();
-  private eventSource: EventSource | null = null;
+  private eventSource: any = null;
   private pollTimer: Timer | null = null;
 
   constructor(config: Config) {
@@ -29,6 +29,7 @@ export class Client {
   }
 
   async init(): Promise<void> {
+    console.log("CLIENT INIT WITH CONFIG:", JSON.stringify(this.config));
     await this.fetchFlags();
     this.startSync();
   }
@@ -67,12 +68,34 @@ export class Client {
   }
 
   private connectStream(): void {
+    if (!this.config.streamerUrl) return;
+    
+    const ES = (globalThis as any).EventSource || PolyfillES;
+    if (!ES) {
+      console.warn("EventSource is not defined. Real-time updates disabled.");
+      return;
+    }
     const url = `${this.config.streamerUrl}/stream?environment_id=${this.config.environmentId}`;
-    this.eventSource = new EventSource(url);
+    this.eventSource = new ES(url);
 
-    this.eventSource.onmessage = (event) => {
+    this.eventSource.onmessage = (event: any) => {
       if (event.data === "update") {
-        console.log("Received update event from streamer, fetching flags...");
+        console.log("Received generic update event from streamer, fetching flags...");
+        this.fetchFlags();
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.environment_id === this.config.environmentId && payload.data && payload.data.key) {
+          console.log(`Received delta update for flag: ${payload.data.key}`);
+          this.flags.set(payload.data.key, payload.data);
+        } else {
+          console.log("Received update for different environment or invalid format, fetching all flags...");
+          this.fetchFlags();
+        }
+      } catch (err) {
+        console.warn("Failed to parse SSE data as JSON, falling back to full fetch", err);
         this.fetchFlags();
       }
     };

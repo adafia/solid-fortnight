@@ -49,12 +49,13 @@ func TestStreamerIntegration(t *testing.T) {
 			select {
 			case msg := <-ch:
 				var payload struct {
-					EnvironmentID string `json:"environment_id"`
+					EnvironmentID string      `json:"environment_id"`
+					Data          interface{} `json:"data"`
 				}
 				if err := json.Unmarshal([]byte(msg.Payload), &payload); err != nil {
 					continue
 				}
-				hub.Broadcast(payload.EnvironmentID, "update")
+				hub.Broadcast(payload.EnvironmentID, msg.Payload)
 			case <-stopSub:
 				return
 			}
@@ -79,12 +80,15 @@ func TestStreamerIntegration(t *testing.T) {
 			http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
 			return
 		}
-		f.Flush() // Flush headers to signal connection established
+		// Write headers immediately
+		w.WriteHeader(http.StatusOK)
+		f.Flush() 
 
 		clientChan := make(chan string, 10)
 		hub.Register(envID, clientChan)
 		defer hub.Unregister(envID, clientChan)
 
+		// Wait for messages to broadcast
 		for {
 			select {
 			case msg := <-clientChan:
@@ -108,7 +112,13 @@ func TestStreamerIntegration(t *testing.T) {
 	go func() {
 		// Wait for client registration to settle
 		time.Sleep(500 * time.Millisecond)
-		payload := map[string]string{"environment_id": envID}
+		payload := map[string]interface{}{
+			"environment_id": envID,
+			"data": map[string]interface{}{
+				"key": "test-flag",
+				"enabled": true,
+			},
+		}
 		data, _ := json.Marshal(payload)
 		rdb.Publish(ctx, "environment_updates", data)
 	}()
@@ -126,7 +136,7 @@ func TestStreamerIntegration(t *testing.T) {
 		t.Fatalf("Failed to read from stream: %v", err)
 	}
 
-	if !strings.Contains(line, "data: update") {
-		t.Errorf("Expected 'data: update', got %q", line)
+	if !strings.Contains(line, "test-flag") {
+		t.Errorf("Expected delta update with 'test-flag', got %q", line)
 	}
 }

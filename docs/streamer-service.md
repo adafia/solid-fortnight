@@ -71,6 +71,16 @@ A utility script is provided to simulate an SDK connection:
 go run scripts/test_sse.go <environment_id>
 ```
 
+### Testing with Bruno
+
+The **Bruno** collection includes a **Streamer API** folder with a **Stream Environment** request. 
+
+1.  Open the Bruno collection.
+2.  Select the **Local** or **Docker** environment.
+3.  Set the `environment_id` variable.
+4.  Send the **Stream Environment** request.
+5.  Bruno will keep the connection open and display real-time events as they arrive.
+
 ### Manual Verification
 
 You can also test using `curl`:

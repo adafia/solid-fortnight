@@ -1,0 +1,32 @@
+meta {
+  name: Stream Environment
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{streamer_base_url}}/stream?environment_id={{environment_id}}
+  body: none
+  auth: none
+}
+
+query {
+  environment_id: {{environment_id}}
+}
+
+docs {
+  ## Stream Environment Updates
+
+  This endpoint establishes a persistent **Server-Sent Events (SSE)** connection to receive real-time updates when feature flag configurations change for a specific environment.
+
+  ### How to use:
+  1.  Ensure you have a valid `environment_id` set in your variables.
+  2.  Send the request. Bruno will maintain the connection and show events as they arrive.
+  3.  Trigger an update via the **Management API** (e.g., using `Upsert Flag Environment` or `Add Variation`).
+  4.  The Streamer will broadcast an `update` event, which will appear in the Bruno response window.
+
+  ### Response:
+  The response will consist of text data events:
+  - `data: update` - Indicates a configuration change occurred.
+  - `: keep-alive` - Heartbeat sent every 30 seconds to maintain the connection.
+}

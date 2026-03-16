@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `docker-compose.yml` to include Redis and the new services.
 - Added `run-streamer` and `run-evaluator` commands to the `Makefile`.
 - Created a test utility script `scripts/test_sse.go` for verifying real-time flag update streams.
+- Added **Streamer API** request to the **Bruno** collection for real-time SSE testing.
 - Implemented Evaluator service in `apps/evaluator` for flag evaluation.
 - Added database migrations for targeting rules and percentage-based rollouts.
 - Implemented targeting rule and rollout support in `internal/storage/store/flag_configs.go`.

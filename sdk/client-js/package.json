@@ -1,0 +1,16 @@
+{
+  "name": "@solid-fortnight/client-js",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/eventsource": "^3.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "eventsource": "^4.1.0"
+  }
+}

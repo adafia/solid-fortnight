@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// DSN returns a data source name for the postgres database.
+// DSN returns the Data Source Name string for PostgreSQL.
 func DSN(host, user, password, dbname string, port int) string {
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -23,45 +23,46 @@ func NewDB(dsn string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
+
 	return db, nil
 }
 
-// Migrate runs the database migrations.
+// Migrate runs database migrations using golang-migrate.
 func Migrate(db *sql.DB, migrationsPath string) error {
-	log.Printf("Running migrations from path: %s", migrationsPath)
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create migrate driver: %w", err)
 	}
 
+	sourceURL := "file://" + migrationsPath
+	log.Printf("Running migrations from path: %s", migrationsPath)
+
 	m, err := migrate.NewWithDatabaseInstance(
-		fmt.Sprintf("file://%s", migrationsPath),
+		sourceURL,
 		"postgres", driver)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize migrate instance: %w", err)
 	}
 
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
-		log.Printf("Failed to get migration version: %v", err)
-		return err
+		return fmt.Errorf("failed to get migration version: %w", err)
 	}
 	log.Printf("Current migration version: %v, dirty: %v", version, dirty)
 
-	err = m.Up()
-	if err != nil && err != migrate.ErrNoChange {
-		log.Printf("Migration failed: %v", err)
-		return err
+	if err := m.Up(); err != nil {
+		if err == migrate.ErrNoChange {
+			log.Println("No new migrations to apply")
+			return nil
+		}
+		return fmt.Errorf("migration failed: %w", err)
 	}
 
-	if err == migrate.ErrNoChange {
-		log.Println("No new migrations to apply")
-	} else {
-		newVersion, _, _ := m.Version()
-		log.Printf("Migrations applied successfully. New version: %v", newVersion)
-	}
+	newVersion, _, _ := m.Version()
+	log.Printf("Migrations applied successfully. New version: %v", newVersion)
 	return nil
 }

@@ -61,6 +61,10 @@ run-streamer:
 	@echo "Running the streamer service..."
 	@REDIS_ADDR=localhost:6379 go run apps/streamer/main.go
 
+run-analytics:
+	@echo "Running the analytics service..."
+	@REDIS_ADDR=localhost:6379 go run apps/analytics/main.go
+
 # ====================================================================================
 #  API TESTS
 # ====================================================================================

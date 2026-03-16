@@ -1,0 +1,11 @@
+meta {
+  name: Get Flag Environment
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{base_url}}/flags/{{flag_id}}/environments/{{env_id}}
+  body: none
+  auth: none
+}

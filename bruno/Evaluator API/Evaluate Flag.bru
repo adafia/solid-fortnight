@@ -1,0 +1,26 @@
+meta {
+  name: Evaluate Flag
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{evaluator_base_url}}/api/v1/evaluate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "project_id": "{{project_id}}",
+    "environment_key": "prod",
+    "flag_key": "new-feature",
+    "context": {
+      "user_id": "user-123",
+      "attributes": {
+        "email": "user@example.com",
+        "country": "US"
+      }
+    }
+  }
+}

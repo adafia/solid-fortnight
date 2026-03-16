@@ -1,0 +1,20 @@
+meta {
+  name: Add Variation
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base_url}}/flags/{{flag_id}}/environments/{{env_id}}/variations
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "flag_environment_id": "{{flag_env_id}}",
+    "key": "true",
+    "value": "true",
+    "name": "Enabled Variation"
+  }
+}

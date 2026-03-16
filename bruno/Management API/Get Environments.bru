@@ -1,0 +1,11 @@
+meta {
+  name: Get Environments
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/projects/{{project_id}}/environments
+  body: none
+  auth: none
+}

@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created `EnvironmentsHandler` to handle environment-specific requests.
 - Added `apps/management/handlers/environments.go`.
 - Added `apps/management/handlers/projects_test.go` for isolated project testing.
+- Added comprehensive Bruno API collection for Management and Evaluator services.
+- Added Bruno documentation for environment and flag variation management.
+- Added Evaluator API documentation with sample context attributes.
 
 ### Changed
 
@@ -28,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `apps/management/main.go` to route environment requests to the new `EnvironmentsHandler`.
 - Updated `apps/management/handlers/environments_test.go` to use the new handler.
 - Refactored `apps/management/handlers/flags_test.go` to support testing multiple handlers.
+- Standardized Bruno collection with consistent variable naming (`base_url`, `evaluator_base_url`) and logical sequencing.
+- Updated Bruno environment configurations for Local and Docker environments.
 
 ### Fixed
 

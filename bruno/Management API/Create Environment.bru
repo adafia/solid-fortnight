@@ -1,0 +1,25 @@
+meta {
+  name: Create Environment
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/projects/{{project_id}}/environments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Production",
+    "key": "prod",
+    "sort_order": 1
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setVar("env_id", res.body.id);
+  }
+}

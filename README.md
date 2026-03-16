@@ -26,15 +26,21 @@ A real-time synchronization service that:
 - Powered by a **Redis Pub/Sub** backbone for cross-service communication.
 - Maintains persistent, high-concurrency client connections with heartbeats.
 
+### 📊 Analytics Service
+A high-throughput event ingestion service that:
+- Buffers evaluation events using **Redis Streams**.
+- Supports bulk ingestion for reduced network overhead.
+- Provides the foundation for A/B testing analysis and usage metrics.
+
 ### 🏗️ Infrastructure & Core
 - **Database**: PostgreSQL for persistent storage and **Redis** for real-time messaging.
 - **Automated Migrations**: Database schema management using `golang-migrate`.
 - **Configuration**: Dynamic configuration via YAML and environment variables.
 - **Local Development**: Comprehensive `Makefile` and Docker Compose setup for quick start.
-- **API Documentation**: Ready-to-use **Bruno** collection for exploring and testing the Management, Evaluator, and Streamer APIs.
+- **API Documentation**: Ready-to-use **Bruno** collection for exploring and testing the Management, Evaluator, Streamer, and Analytics APIs.
 
 ### 🔌 SDKs (Work in Progress)
-- **Go Server SDK**: Initial structure for server-side evaluation.
+- **Go Server SDK**: Initial structure for server-side evaluation with local caching and real-time SSE updates.
 
 ## Project Setup
 
@@ -53,15 +59,16 @@ To get started with Solid Fortnight, follow these steps:
    - **Management**: `make run-app`
    - **Evaluator**: `make run-evaluator`
    - **Streamer**: `make run-streamer`
+   - **Analytics**: `make run-analytics`
    - **All (Docker)**: `make start-all`
 
 ## Project Structure
 
 The project is organized into several key directories:
 
-- **`apps/`**: Individual microservices (`management`, `evaluator`, `streamer`).
+- **`apps/`**: Individual microservices (`management`, `evaluator`, `streamer`, `analytics`).
 - **`deployments/`**: Stores configuration files like `config.yaml` and `docker-compose.yml`.
-- **`internal/`**: Shared internal libraries (config, evaluation engine, storage drivers, pubsub).
+- **`internal/`**: Shared internal libraries (config, evaluation engine, storage drivers, pubsub, protocol).
 - **`docs/`**: Detailed service documentation and testing strategies.
 
 ## Running the Application
@@ -85,3 +92,4 @@ This project uses **Bruno** for API testing. The collection is located in the `b
 4.  Use the **Management API** to create projects and flags.
 5.  Use the **Evaluator API** to test targeting rules.
 6.  Use the **Streamer API** to watch real-time updates.
+7.  Use the **Analytics API** to send evaluation events.

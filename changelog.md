@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented core evaluation engine in `internal/engine`.
+- Added support for multi-clause targeting rules with various operators (EQUALS, IN, CONTAINS, etc.).
+- Added consistent percentage-based rollouts using MD5 hashing.
+- Comprehensive unit tests for the evaluation engine.
+- Added "Currently Implemented Features" section to `README.md`.
 - Created `EnvironmentsHandler` to handle environment-specific requests.
 - Added `apps/management/handlers/environments.go`.
 - Added `apps/management/handlers/projects_test.go` for isolated project testing.

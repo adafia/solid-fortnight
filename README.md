@@ -6,7 +6,27 @@
 
 Solid Fortnight is a feature flagging system designed to provide dynamic control over application features. It allows developers to roll out new features to a subset of users, perform A/B testing, and quickly toggle features on or off without deploying new code.
 
-## Getting Started
+## Currently Implemented Features
+
+### 🛠️ Management API
+A RESTful API for administrative operations, including:
+- **Project Management**: Create, list, and retrieve projects.
+- **Environment Management**: Define multiple environments (e.g., Development, Staging, Production) per project.
+- **Flag Management**: Full CRUD operations for feature flags, including:
+  - Boolean and Multivariate flag support.
+  - Environment-specific flag configurations and overrides.
+  - Tagging and metadata support.
+
+### 🏗️ Infrastructure & Core
+- **Database**: PostgreSQL integration with automated migrations using `golang-migrate`.
+- **Configuration**: Dynamic configuration management via YAML and environment variables.
+- **Local Development**: Comprehensive `Makefile` and Docker Compose setup for quick start.
+- **API Documentation & Testing**: Ready-to-use **Bruno** collection for exploring and testing the Management API.
+
+### 🔌 SDKs (Work in Progress)
+- **Go Server SDK**: Initial structure for server-side evaluation.
+
+## Project Structure
 
 To get started with Solid Fortnight, follow these steps:
 

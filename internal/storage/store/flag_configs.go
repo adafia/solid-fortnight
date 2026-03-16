@@ -9,6 +9,7 @@ import (
 type FlagEnvironment struct {
 	ID                 string      `json:"id"`
 	FlagID             string      `json:"flag_id"`
+	FlagKey            string      `json:"flag_key"`
 	EnvironmentID      string      `json:"environment_id"`
 	Enabled            bool        `json:"enabled"`
 	DefaultVariationID *string     `json:"default_variation_id"`
@@ -47,17 +48,72 @@ func NewFlagConfigStore(db *sql.DB) *FlagConfigStore {
 	return &FlagConfigStore{db: db}
 }
 
+// GetFlagsForEnvironment retrieves all flag configurations for a specific environment.
+func (s *FlagConfigStore) GetFlagsForEnvironment(environmentID string) ([]FlagEnvironment, error) {
+	query := `
+		SELECT fe.id, fe.flag_id, f.key, fe.environment_id, fe.enabled, fe.default_variation_id, fe.version, fe.updated_at, fe.updated_by, fe.rollout_percentage, fe.rollout_variation_id
+		FROM flag_environments fe
+		JOIN flags f ON fe.flag_id = f.id
+		WHERE fe.environment_id = $1 AND f.archived = false`
+
+	rows, err := s.db.Query(query, environmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var configs []FlagEnvironment
+	for rows.Next() {
+		var fe FlagEnvironment
+		err := rows.Scan(
+			&fe.ID,
+			&fe.FlagID,
+			&fe.FlagKey,
+			&fe.EnvironmentID,
+			&fe.Enabled,
+			&fe.DefaultVariationID,
+			&fe.Version,
+			&fe.UpdatedAt,
+			&fe.UpdatedBy,
+			&fe.RolloutPercentage,
+			&fe.RolloutVariationID,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Fetch variations
+		variations, err := s.GetVariations(fe.ID)
+		if err != nil {
+			return nil, err
+		}
+		fe.Variations = variations
+
+		// Fetch rules
+		rules, err := s.GetRules(fe.ID)
+		if err != nil {
+			return nil, err
+		}
+		fe.Rules = rules
+
+		configs = append(configs, fe)
+	}
+	return configs, nil
+}
+
 // GetFlagEnvironment retrieves the configuration for a specific flag and environment.
 func (s *FlagConfigStore) GetFlagEnvironment(flagID, environmentID string) (*FlagEnvironment, error) {
 	fe := &FlagEnvironment{}
 	query := `
-		SELECT id, flag_id, environment_id, enabled, default_variation_id, version, updated_at, updated_by, rollout_percentage, rollout_variation_id
-		FROM flag_environments
-		WHERE flag_id = $1 AND environment_id = $2`
+		SELECT fe.id, fe.flag_id, f.key, fe.environment_id, fe.enabled, fe.default_variation_id, fe.version, fe.updated_at, fe.updated_by, fe.rollout_percentage, fe.rollout_variation_id
+		FROM flag_environments fe
+		JOIN flags f ON fe.flag_id = f.id
+		WHERE fe.flag_id = $1 AND fe.environment_id = $2`
 
 	err := s.db.QueryRow(query, flagID, environmentID).Scan(
 		&fe.ID,
 		&fe.FlagID,
+		&fe.FlagKey,
 		&fe.EnvironmentID,
 		&fe.Enabled,
 		&fe.DefaultVariationID,

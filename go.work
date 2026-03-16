@@ -10,4 +10,5 @@ use (
 	./internal/engine
 	./internal/protocol
 	./internal/storage
+	./sdk/server-go
 )

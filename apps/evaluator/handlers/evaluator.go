@@ -48,6 +48,10 @@ func NewEvaluatorHandler(
 }
 
 func (h *EvaluatorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		h.GetFlags(w, r)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -111,6 +115,29 @@ func (h *EvaluatorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *EvaluatorHandler) GetFlags(w http.ResponseWriter, r *http.Request) {
+	envID := r.URL.Query().Get("environment_id")
+	if envID == "" {
+		http.Error(w, "Missing environment_id parameter", http.StatusBadRequest)
+		return
+	}
+
+	configs, err := h.configStore.GetFlagsForEnvironment(envID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get flag configurations: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Map to Engine Configs
+	engineConfigs := make([]engine.FlagConfig, len(configs))
+	for i, fe := range configs {
+		engineConfigs[i] = h.mapToEngineConfig(fe.FlagKey, &fe)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(engineConfigs)
 }
 
 func (h *EvaluatorHandler) mapToEngineConfig(flagKey string, fe *store.FlagEnvironment) engine.FlagConfig {

@@ -33,7 +33,7 @@ test-db-down:
 
 test: test-db-up
 	@echo "Running tests..."
-	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword go test -v ./apps/management/... ./internal/config/...
+	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword go test -v ./apps/management/handlers ./apps/evaluator/handlers ./internal/config ./internal/engine
 	@$(MAKE) test-db-down
 
 start-all:

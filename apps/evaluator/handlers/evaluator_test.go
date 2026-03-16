@@ -1,13 +1,9 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/adafia/solid-fortnight/internal/engine"
 )
 
 // Mock stores for testing would be better, but we can do a quick check

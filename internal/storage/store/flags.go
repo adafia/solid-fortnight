@@ -74,6 +74,35 @@ func (s *FlagStore) GetFlag(id string) (*Flag, error) {
 	return flag, nil
 }
 
+// GetFlagByKey retrieves a flag from the database by its project and key.
+func (s *FlagStore) GetFlagByKey(projectID, key string) (*Flag, error) {
+	flag := &Flag{}
+	query := `
+		SELECT id, project_id, key, name, description, type, tags, created_by, created_at, updated_at, archived
+		FROM flags
+		WHERE project_id = $1 AND key = $2 AND archived = false`
+	err := s.db.QueryRow(query, projectID, key).Scan(
+		&flag.ID,
+		&flag.ProjectID,
+		&flag.Key,
+		&flag.Name,
+		&flag.Description,
+		&flag.Type,
+		&flag.Tags,
+		&flag.CreatedBy,
+		&flag.CreatedAt,
+		&flag.UpdatedAt,
+		&flag.Archived,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return flag, nil
+}
+
 // UpdateFlag updates a flag in the database.
 func (s *FlagStore) UpdateFlag(flag *Flag) error {
 	query := `

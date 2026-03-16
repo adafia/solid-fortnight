@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented Evaluator service in `apps/evaluator` for flag evaluation.
+- Added database migrations for targeting rules and percentage-based rollouts.
+- Implemented targeting rule and rollout support in `internal/storage/store/flag_configs.go`.
+- Added `GetFlagByKey` and `GetEnvironmentByKey` methods to the storage layer.
 - Implemented core evaluation engine in `internal/engine`.
 - Added support for multi-clause targeting rules with various operators (EQUALS, IN, CONTAINS, etc.).
 - Added consistent percentage-based rollouts using MD5 hashing.

@@ -82,6 +82,30 @@ func (s *ProjectStore) CreateEnvironment(env *Environment) error {
 	return err
 }
 
+// GetEnvironmentByKey retrieves an environment from the database by its project and key.
+func (s *ProjectStore) GetEnvironmentByKey(projectID, key string) (*Environment, error) {
+	env := &Environment{}
+	query := `
+		SELECT id, project_id, name, key, sort_order, created_at
+		FROM environments
+		WHERE project_id = $1 AND key = $2`
+	err := s.db.QueryRow(query, projectID, key).Scan(
+		&env.ID,
+		&env.ProjectID,
+		&env.Name,
+		&env.Key,
+		&env.SortOrder,
+		&env.CreatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return env, nil
+}
+
 // GetEnvironments retrieves all environments for a project.
 func (s *ProjectStore) GetEnvironments(projectID string) ([]Environment, error) {
 	query := `

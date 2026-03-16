@@ -8,11 +8,11 @@ The service is designed for high-throughput ingestion using a **Producer-Consume
 
 ### Flow of Events
 
-1.  **Event Generation**: SDKs or the API Gateway generate evaluation events whenever a flag is evaluated.
-2.  **Batch Ingestion**: The SDKs send events in batches to the Analytics API (`POST /api/v1/events/bulk`).
-3.  **Queuing**: The Analytics API pushes these events into a Redis Stream (`evaluation_events_stream`) using Redis pipelines for sub-millisecond queuing latency.
-4.  **Processing (Planned)**: An asynchronous background worker consumes events from the Redis Stream.
-5.  **Storage (Planned)**: The worker batch-inserts the processed events into the PostgreSQL `evaluation_events` table.
+1. **Event Generation**: SDKs or the API Gateway generate evaluation events whenever a flag is evaluated.
+2. **Batch Ingestion**: The SDKs send events in batches to the Analytics API (`POST /api/v1/events/bulk`).
+3. **Queuing**: The Analytics API pushes these events into a Redis Stream (`evaluation_events_stream`) using Redis pipelines for sub-millisecond queuing latency.
+4. **Processing (Planned)**: An asynchronous background worker consumes events from the Redis Stream.
+5. **Storage (Planned)**: The worker batch-inserts the processed events into the PostgreSQL `evaluation_events` table.
 
 ## API Specification
 
@@ -56,7 +56,7 @@ The common event structure used across the system:
 | `environment_id` | `string` | UUID of the environment. |
 | `flag_key` | `string` | Unique key of the feature flag. |
 | `user_id` | `string` | Unique identifier for the user. |
-| `variation_key`| `string` | The key of the variation served (e.g., "control", "treatment"). |
+| `variation_key` | `string` | The key of the variation served (e.g., "control", "treatment"). |
 | `value` | `json` | The actual value served to the user. |
 | `reason` | `string` | The reason for the evaluation result (e.g., "default", "targeting rule"). |
 | `context` | `json` | The user attributes used during evaluation. |
@@ -94,5 +94,5 @@ The service uses the following environment variables:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `REDIS_ADDR` | Redis connection address. | `localhost:6379` |
-| `REDIS_PASSWORD`| Redis password. | `""` |
+| `REDIS_PASSWORD` | Redis password. | `""` |
 | `CONFIG_PATH` | Path to YAML config. | `deployments/config.yaml` |

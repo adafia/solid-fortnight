@@ -19,7 +19,7 @@ func TestNewEvaluatorHandler(t *testing.T) {
 
 func TestEvaluatorHandler_ServeHTTP_MethodNotAllowed(t *testing.T) {
 	h := NewEvaluatorHandler(nil, nil, nil, nil)
-	req, _ := http.NewRequest(http.MethodGet, "/evaluate", nil)
+	req, _ := http.NewRequest(http.MethodPut, "/evaluate", nil)
 	rr := httptest.NewRecorder()
 
 	h.ServeHTTP(rr, req)

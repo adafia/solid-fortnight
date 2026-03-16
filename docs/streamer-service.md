@@ -8,10 +8,10 @@ The service uses **Server-Sent Events (SSE)** to push updates to connected clien
 
 ### Flow of Events
 
-1.  **Change Trigger**: A user updates a flag configuration or variation via the Management API.
-2.  **Publish**: The Management API publishes an `environment_update` message to Redis on the `environment_updates` channel.
-3.  **Subscribe**: The Streamer service is subscribed to this Redis channel.
-4.  **Broadcast**: Upon receiving the message, the Streamer identifies all clients currently connected to that specific `environment_id` and broadcasts an `update` event to them via their SSE connection.
+1. **Change Trigger**: A user updates a flag configuration or variation via the Management API.
+2. **Publish**: The Management API publishes an `environment_update` message to Redis on the `environment_updates` channel.
+3. **Subscribe**: The Streamer service is subscribed to this Redis channel.
+4. **Broadcast**: Upon receiving the message, the Streamer identifies all clients currently connected to that specific `environment_id` and broadcasts an `update` event to them via their SSE connection.
 
 ## API Specification
 
@@ -33,7 +33,7 @@ Establish a persistent SSE connection to receive updates for a specific environm
 
 **Message Format:**
 
-The service sends simple text messages prefixed with `data: `.
+The service sends simple text messages prefixed with `data:`.
 
 - **Update Event**: `data: update\n\n`
 - **Keep-alive (Heartbeat)**: `: keep-alive\n\n` (Sent every 30 seconds to maintain the connection).
@@ -73,13 +73,13 @@ go run scripts/test_sse.go <environment_id>
 
 ### Testing with Bruno
 
-The **Bruno** collection includes a **Streamer API** folder with a **Stream Environment** request. 
+The **Bruno** collection includes a **Streamer API** folder with a **Stream Environment** request.
 
-1.  Open the Bruno collection.
-2.  Select the **Local** or **Docker** environment.
-3.  Set the `environment_id` variable.
-4.  Send the **Stream Environment** request.
-5.  Bruno will keep the connection open and display real-time events as they arrive.
+1. Open the Bruno collection.
+2. Select the **Local** or **Docker** environment.
+3. Set the `environment_id` variable.
+4. Send the **Stream Environment** request.
+5. Bruno will keep the connection open and display real-time events as they arrive.
 
 ### Manual Verification
 

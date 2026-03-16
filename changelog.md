@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented **JS SDK** (`sdk/client-js`) using Bun and TypeScript, featuring local evaluation and real-time SSE updates.
+- Implemented **Go Server SDK** (`sdk/server-go`) with local caching, real-time synchronization via SSE, and fallback polling.
+- Implemented **Analytics Service** (`apps/analytics`) for high-throughput evaluation event ingestion using Redis Streams.
+- Created `internal/protocol` package for shared event schemas.
+- Added database migrations for `evaluation_events` storage.
+- Added integration tests for Analytics and Streamer services.
 - Implemented Streamer service in `apps/streamer` for real-time flag updates via Server-Sent Events (SSE).
 - Integrated Redis for Pub/Sub messaging and shared configuration.
 - Created `internal/storage/pubsub` package for publishing environment updates from the Management API.

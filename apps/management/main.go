@@ -48,15 +48,24 @@ func main() {
 	// Set up stores
 	flagStore := store.NewFlagStore(database)
 	projectStore := store.NewProjectStore(database)
+	configStore := store.NewFlagConfigStore(database)
 
 	// Set up handlers
-	flagsHandler := handlers.NewFlagsHandler(flagStore)
+	flagsHandler := handlers.NewFlagsHandler(flagStore, configStore)
 	projectsHandler := handlers.NewProjectsHandler(projectStore)
+	environmentsHandler := handlers.NewEnvironmentsHandler(projectStore)
 
 	// Set up router
 	mux := http.NewServeMux()
 	mux.Handle("/flags/", flagsHandler)
-	mux.Handle("/projects/", projectsHandler)
+	mux.HandleFunc("/projects/", func(w http.ResponseWriter, r *http.Request) {
+		parts := handlers.SplitPath(r.URL.Path)
+		if len(parts) >= 3 && parts[2] == "environments" {
+			environmentsHandler.ServeHTTP(w, r)
+			return
+		}
+		projectsHandler.ServeHTTP(w, r)
+	})
 
 	// Start server
 	port := cfg.Services["management"].Port

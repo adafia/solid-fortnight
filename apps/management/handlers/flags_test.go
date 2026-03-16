@@ -18,10 +18,14 @@ import (
 )
 
 var (
-	testDB       *sql.DB
-	flagStore    *store.FlagStore
-	flagsHandler http.Handler
-	projectID    string
+	testDB          *sql.DB
+	flagStore       *store.FlagStore
+	projectStore    *store.ProjectStore
+	configStore     *store.FlagConfigStore
+	flagsHandler       http.Handler
+	projectsHandler    http.Handler
+	environmentsHandler http.Handler
+	projectID          string
 )
 
 func TestMain(m *testing.M) {
@@ -59,7 +63,11 @@ func TestMain(m *testing.M) {
 
 	// Set up stores and handlers
 	flagStore = store.NewFlagStore(testDB)
-	flagsHandler = handlers.NewFlagsHandler(flagStore)
+	projectStore = store.NewProjectStore(testDB)
+	configStore = store.NewFlagConfigStore(testDB)
+	flagsHandler = handlers.NewFlagsHandler(flagStore, configStore)
+	projectsHandler = handlers.NewProjectsHandler(projectStore)
+	environmentsHandler = handlers.NewEnvironmentsHandler(projectStore)
 
 	// Create a project for the tests
 	truncateTables()
@@ -114,7 +122,7 @@ func TestCRUD_Flags(t *testing.T) {
 		}
 		body, _ := json.Marshal(flag)
 
-		req, _ := http.NewRequest(http.MethodPost, "/flags/", bytes.NewBuffer(body))
+		req, _ := http.NewRequest(http.MethodPost, "/flags", bytes.NewBuffer(body))
 		rr := httptest.NewRecorder()
 
 		flagsHandler.ServeHTTP(rr, req)

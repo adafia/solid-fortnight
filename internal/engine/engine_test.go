@@ -176,3 +176,39 @@ func TestEvaluate_Rules(t *testing.T) {
 		t.Errorf("expected default variation, got %s", regularResult.VariationID)
 	}
 }
+
+func BenchmarkEvaluate(b *testing.B) {
+	evaluator := NewEvaluator()
+	varID := "v1"
+	config := FlagConfig{
+		ID:      "flag-1",
+		Key:     "bench-flag",
+		Enabled: true,
+		DefaultVariationID: &varID,
+		Variations: []Variation{
+			{ID: varID, Key: "v1", Value: json.RawMessage(`true`)},
+		},
+		Rules: []Rule{
+			{
+				ID: "rule-1",
+				VariationID: varID,
+				Clauses: []Clause{
+					{Attribute: "attr1", Operator: OperatorEquals, Values: []string{"val1"}},
+					{Attribute: "attr2", Operator: OperatorContains, Values: []string{"val2"}},
+				},
+			},
+		},
+	}
+	context := UserContext{
+		ID: "user-1",
+		Attributes: map[string]interface{}{
+			"attr1": "val1",
+			"attr2": "some-val2-thing",
+		},
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = evaluator.Evaluate(config, context)
+	}
+}

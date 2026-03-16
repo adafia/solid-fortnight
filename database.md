@@ -130,7 +130,14 @@ In addition to PostgreSQL for persistent storage, Solid Fortnight uses **Redis**
 | :--- | :--- | :--- |
 | `environment_updates` | Broadcasts flag changes to the Streamer service | `{"environment_id": "uuid"}` |
 
+### Redis Streams
+
+| Stream | Description | Role |
+| :--- | :--- | :--- |
+| `evaluation_events_stream` | High-throughput buffer for flag evaluation events | decoupling ingestion from persistence |
+
 ### Role in Architecture
 
 1.  **Management API**: Publishes an event to `environment_updates` whenever a flag's configuration or variation is modified.
 2.  **Streamer Service**: Subscribes to the `environment_updates` channel and pushes SSE updates to all clients connected to the affected environment.
+3.  **Analytics Service**: Ingests events into `evaluation_events_stream`, which is then processed by a background worker for persistence in PostgreSQL.

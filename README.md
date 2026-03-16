@@ -34,11 +34,12 @@ A real-time synchronization service that:
 
 ### 📊 Analytics Service
 
-A high-throughput event ingestion service that:
+A high-throughput event ingestion and processing service that:
 
-- Buffers evaluation events using **Redis Streams**.
+- Buffers evaluation events using **Redis Streams** for sub-millisecond ingestion.
+- Processes events asynchronously via a **Background Worker** with consumer groups.
+- Persists events in **PostgreSQL** for long-term A/B testing analysis and metrics.
 - Supports bulk ingestion for reduced network overhead.
-- Provides the foundation for A/B testing analysis and usage metrics.
 
 ### 🏗️ Infrastructure & Core
 

@@ -1,65 +1,70 @@
 # Testing Strategy
 
-This document outlines the testing strategy for the `solid-fortnight` project, focusing on the management service and its integration with the database.
+This document outlines the testing strategy for the `solid-fortnight` project, ensuring reliability across the management, evaluator, streamer, and analytics services.
 
 ## 1. Overview
 
 The project uses a multi-layered testing approach to ensure reliability and maintainability:
 
-* **Unit Tests:** Test individual components (e.g., configuration loading, utility functions) in isolation without external dependencies.
-* **Integration Tests:** Verify that different parts of the system work together, specifically handlers and storage layers interacting with a real PostgreSQL database.
+* **Unit Tests:** Test individual components (e.g., `internal/engine`, configuration loading, utility functions) in isolation.
+* **Integration Tests:** Verify that different parts of the system work together, specifically handlers and storage layers interacting with real PostgreSQL and Redis instances.
+* **Benchmarks:** Measure and ensure the performance of critical components like the flag evaluation engine.
 
 ## 2. Environment Isolation
 
-To prevent tests from interfering with development data, a dedicated test environment is used.
+To prevent tests from interfering with development data, a dedicated test environment is used via Docker Compose.
 
 ### Development Environment
-
-* **Database Port:** `5432`
-* **Database Name:** `solid_fortnight`
-* **Command to start:** `make start-db`
+* **PostgreSQL:** `localhost:5432` (DB: `solid_fortnight`)
+* **Redis:** `localhost:6379`
+* **Command:** `make start-db`
 
 ### Testing Environment
+* **PostgreSQL:** `localhost:5433` (DB: `solid_fortnight_test`)
+* **Redis:** `localhost:6380`
+* **Command:** `make test`
 
-* **Database Port:** `5433`
-* **Database Name:** `solid_fortnight_test`
-* **Command to start/run:** `make test`
+## 3. Testing Patterns
 
-## 3. Integration Testing Workflow
+### Integration Testing (Synchronous)
+Used for the Management API. These tests ensure that HTTP requests correctly modify the PostgreSQL state.
+* **Workflow:** Setup DB -> Run Migration -> Execute Request -> Verify DB State -> Truncate Tables.
 
-Integration tests for the management service (located in `apps/management/handlers/`) and the streamer service (`apps/streamer/`) follow this lifecycle:
+### Asynchronous Testing (Worker Pattern)
+Used for the Analytics service. Testing the flow from the Ingestion API to Redis Streams and finally to PostgreSQL.
+* **Pattern:** "Poll with Timeout". The test produces an event and then polls the database in a loop (with a timeout) until the expected record appears.
+* **Example:** See `apps/analytics/handlers/analytics_integration_test.go`.
 
-1. **Orchestration:** The `make test` command starts dedicated PostgreSQL and Redis containers using `deployments/docker-compose.test.yml`.
-2. **Health Check:** The Makefile waits for both databases to be "healthy" before starting the tests.
-3. **Setup:**
-    * **Management/Evaluator:** Loads configuration, overrides connection details, and runs migrations.
-    * **Streamer:** Connects to the test Redis instance and verifies Pub/Sub broadcasting.
-4. **Execution:** Each test run ensures a clean state (truncating tables for Postgres).
-5. **Cleanup:** Containers are automatically stopped and removed.
+### Performance Benchmarking
+Critical for the `internal/engine` package to ensure flag evaluation remains in the sub-millisecond range.
+* **Command:** `go test -bench=. ./internal/engine`
 
-## 4. Running Tests
+## 4. Mocking Strategy
+
+* **Prefer Real Infrastructure:** For integration tests, always use the real PostgreSQL/Redis containers provided by the test environment.
+* **Use Mocks for Isolation:** Use interfaces and mocks (e.g., `mockProcessor` in Analytics) when testing high-level handlers to avoid heavy setup for simple logic checks.
+
+## 5. Running Tests
 
 ### All Tests
-
 ```bash
 make test
 ```
 
-### Specific Module Tests
-
+### Specific Service Tests
 ```bash
-# 1. Start the test databases
+# Start test containers
 make test-db-up
 
-# 2. Run your specific tests (e.g., Streamer)
-REDIS_ADDR=localhost:6380 go test -v ./apps/streamer
+# Run specific tests (e.g., Evaluator)
+go test -v ./apps/evaluator/handlers
 
-# 3. Stop the test databases
-make test-db-down
+# Run benchmarks
+go test -bench=. ./internal/engine
 ```
 
-## 5. Adding New Tests
+## 6. Adding New Tests
 
-* **Unit Tests:** Create `*_test.go` files in the same package as the code being tested.
-* **Integration Tests:** Add tests to `apps/management/handlers/` or create new handler test files. Use the existing `TestMain` pattern to leverage the database orchestration.
-* **Data Cleanup:** Always use `truncateTables()` or a similar mechanism in your tests to avoid side effects between test runs.
+* **Unit Tests:** Create `*_test.go` files in the same package.
+* **Integration Tests:** Use the `TestMain` pattern or ensure containers are up.
+* **Cleanup:** Always use `truncateTables()` or unique identifiers (UUIDs) for test data to avoid cross-test interference.

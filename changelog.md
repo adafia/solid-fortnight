@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented **Analytics Background Worker** (`apps/analytics/service/worker.go`) to consume evaluation events from Redis Streams.
+- Implemented **PostgreSQL Persistence** for evaluation events in the Analytics service using batch insertions.
+- Added **Performance Benchmarks** for the core evaluation engine (`internal/engine/engine_test.go`).
+- Expanded **Testing Strategy** documentation (`docs/testing-strategy.md`) with asynchronous testing patterns and performance monitoring.
+- Added end-to-end integration tests for the Analytics pipeline (API -> Redis -> Worker -> PostgreSQL).
 - Implemented **JS SDK** (`sdk/client-js`) using Bun and TypeScript, featuring local evaluation and real-time SSE updates.
 - Implemented **Go Server SDK** (`sdk/server-go`) with local caching, real-time synchronization via SSE, and fallback polling.
 - Implemented **Analytics Service** (`apps/analytics`) for high-throughput evaluation event ingestion using Redis Streams.

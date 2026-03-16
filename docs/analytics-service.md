@@ -11,8 +11,8 @@ The service is designed for high-throughput ingestion using a **Producer-Consume
 1. **Event Generation**: SDKs or the API Gateway generate evaluation events whenever a flag is evaluated.
 2. **Batch Ingestion**: The SDKs send events in batches to the Analytics API (`POST /api/v1/events/bulk`).
 3. **Queuing**: The Analytics API pushes these events into a Redis Stream (`evaluation_events_stream`) using Redis pipelines for sub-millisecond queuing latency.
-4. **Processing (Planned)**: An asynchronous background worker consumes events from the Redis Stream.
-5. **Storage (Planned)**: The worker batch-inserts the processed events into the PostgreSQL `evaluation_events` table.
+4. **Processing**: An asynchronous background worker (`service/worker.go`) consumes events from the Redis Stream using consumer groups.
+5. **Storage**: The worker batch-inserts the processed events into the PostgreSQL `evaluation_events` table for persistent storage.
 
 ## API Specification
 

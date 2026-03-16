@@ -148,7 +148,7 @@ A production-ready feature flag service that enables development teams to safely
 | **API Gateway** | [PLANNED] | Entry point for all requests. Handles authentication, rate limiting. |
 | **Evaluation Service** | [IMPLEMENTED] | Core service that evaluates flags based on targeting rules. |
 | **Management Service** | [IMPLEMENTED] | Handles CRUD operations for flags, environments, and rules. |
-| **Analytics Service** | [PLANNED] | Ingests evaluation events, computes metrics, powers dashboard. |
+| **Analytics Service** | [IMPLEMENTED] | Ingests evaluation events, computes metrics, powers dashboard. |
 | **Stream Service** | [IMPLEMENTED] | Manages SSE connections for real-time flag updates to SDKs. |
 | **Admin Dashboard** | [PLANNED] | React-based web UI for managing flags and viewing analytics. |
 
@@ -159,7 +159,7 @@ A production-ready feature flag service that enables development teams to safely
 | **PostgreSQL** | Primary database for configurations, targeting rules, logs. | [IMPLEMENTED] |
 | **Redis** | Pub/Sub messaging and shared configuration. | [IMPLEMENTED] |
 | **TimescaleDB** | Time-series database for analytics events and metrics. | [PLANNED] |
-| **Message Queue** | Redis for change notifications and async processing. | [IMPLEMENTED] |
+| **Message Queue** | Redis Streams for async event processing and change notifications. | [IMPLEMENTED] |
 
 ### Technology Stack (Recommended)
 

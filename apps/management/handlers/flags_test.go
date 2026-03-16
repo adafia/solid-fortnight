@@ -65,7 +65,7 @@ func TestMain(m *testing.M) {
 	flagStore = store.NewFlagStore(testDB)
 	projectStore = store.NewProjectStore(testDB)
 	configStore = store.NewFlagConfigStore(testDB)
-	flagsHandler = handlers.NewFlagsHandler(flagStore, configStore)
+	flagsHandler = handlers.NewFlagsHandler(flagStore, configStore, nil)
 	projectsHandler = handlers.NewProjectsHandler(projectStore)
 	environmentsHandler = handlers.NewEnvironmentsHandler(projectStore)
 

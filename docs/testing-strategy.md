@@ -27,22 +27,19 @@ To prevent tests from interfering with development data, a dedicated test enviro
 
 ## 3. Integration Testing Workflow
 
-Integration tests for the management service (located in `apps/management/handlers/`) follow this lifecycle:
+Integration tests for the management service (located in `apps/management/handlers/`) and the streamer service (`apps/streamer/`) follow this lifecycle:
 
-1. **Orchestration:** The `make test` command starts a dedicated PostgreSQL container using `deployments/docker-compose.test.yml`.
-2. **Health Check:** The Makefile waits for the database to be "healthy" (via `pg_isready`) before starting the tests.
-3. **Setup (`TestMain`):**
-    * Loads configuration from `deployments/config.yaml`.
-    * Overrides connection details using environment variables (`POSTGRES_PORT=5433`, etc.).
-    * Runs database migrations to ensure the test schema is up-to-date.
-4. **Execution:** Each test run truncates relevant tables to ensure a clean state for every test case.
-5. **Cleanup:** After the tests finish, the test database container and network are automatically stopped and removed.
+1. **Orchestration:** The `make test` command starts dedicated PostgreSQL and Redis containers using `deployments/docker-compose.test.yml`.
+2. **Health Check:** The Makefile waits for both databases to be "healthy" before starting the tests.
+3. **Setup:**
+    * **Management/Evaluator:** Loads configuration, overrides connection details, and runs migrations.
+    * **Streamer:** Connects to the test Redis instance and verifies Pub/Sub broadcasting.
+4. **Execution:** Each test run ensures a clean state (truncating tables for Postgres).
+5. **Cleanup:** Containers are automatically stopped and removed.
 
 ## 4. Running Tests
 
 ### All Tests
-
-To run all tests (unit and integration) across the workspace:
 
 ```bash
 make test
@@ -50,21 +47,14 @@ make test
 
 ### Specific Module Tests
 
-If you want to run tests for a specific module without the full `make` orchestration, you must ensure the test database is running and provide the environment variables:
-
 ```bash
-# 1. Start the test database
+# 1. Start the test databases
 make test-db-up
 
-# 2. Run your specific tests
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5433
-DB_NAME=solid_fortnight_test
-DB_USER=testuser
-DB_PASSWORD=testpassword
-go test -v ./apps/management/handlers/...
+# 2. Run your specific tests (e.g., Streamer)
+REDIS_ADDR=localhost:6380 go test -v ./apps/streamer
 
-# 3. Stop the test database
+# 3. Stop the test databases
 make test-db-down
 ```
 

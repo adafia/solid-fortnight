@@ -13,27 +13,28 @@ stop-db:
 	@docker-compose -f deployments/docker-compose.yml stop postgres redis
 
 test-db-up:
-	@echo "Starting PostgreSQL test database..."
-	@docker-compose -f deployments/docker-compose.test.yml up -d postgres-test
-	@echo "Waiting for test database to be ready..."
+	@echo "Starting PostgreSQL and Redis test databases..."
+	@docker-compose -f deployments/docker-compose.test.yml up -d postgres-test redis-test
+	@echo "Waiting for test databases to be ready..."
 	@for i in {1..20}; do \
-		if docker inspect -f '{{.State.Health.Status}}' deployments-postgres-test-1 | grep -q "healthy"; then \
-			echo "Test database is ready!"; \
+		if docker inspect -f '{{.State.Health.Status}}' deployments-postgres-test-1 | grep -q "healthy" && \
+		   docker inspect -f '{{.State.Health.Status}}' deployments-redis-test-1 | grep -q "healthy"; then \
+			echo "Test databases are ready!"; \
 			exit 0; \
 		fi; \
 		echo "Waiting... ($$i/20)"; \
 		sleep 1; \
 	done; \
-	echo "Error: Test database failed to become healthy."; \
+	echo "Error: Test databases failed to become healthy."; \
 	exit 1
 
 test-db-down:
-	@echo "Stopping PostgreSQL test database..."
+	@echo "Stopping PostgreSQL and Redis test databases..."
 	@docker-compose -f deployments/docker-compose.test.yml down
 
 test: test-db-up
 	@echo "Running tests..."
-	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword go test -v ./apps/management/handlers ./apps/evaluator/handlers ./internal/config ./internal/engine
+	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword REDIS_ADDR=localhost:6380 go test -v ./apps/management/handlers ./apps/evaluator/handlers ./apps/streamer ./internal/config ./internal/engine
 	@$(MAKE) test-db-down
 
 start-all:

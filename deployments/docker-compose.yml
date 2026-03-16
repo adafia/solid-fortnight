@@ -80,5 +80,23 @@ services:
       redis:
         condition: service_healthy
 
+  gateway:
+    build:
+      context: ..
+      dockerfile: apps/gateway/Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      MANAGEMENT_HOST: management
+      EVALUATOR_HOST: evaluator
+      STREAMER_HOST: streamer
+      ANALYTICS_HOST: analytics
+    depends_on:
+      - management
+      - evaluator
+      - streamer
+      - analytics
+
 volumes:
   postgres_data:

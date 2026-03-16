@@ -69,7 +69,7 @@ client.close();
 | :--- | :--- | :--- | :--- |
 | `evaluatorUrl` | `string` | URL of the Evaluator service. | Required |
 | `streamerUrl` | `string` | URL of the Streamer service. | Required |
-| `environmentId`| `string` | UUID of the environment. | Required |
+| `environmentId` | `string` | UUID of the environment. | Required |
 | `pollInterval` | `number` | Fallback polling interval in ms. | `300000` (5 mins) |
 
 ## Development

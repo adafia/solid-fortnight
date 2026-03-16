@@ -34,7 +34,7 @@ test-db-down:
 
 test: test-db-up
 	@echo "Running tests..."
-	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword REDIS_ADDR=localhost:6380 go test -v ./apps/management/handlers ./apps/evaluator/handlers ./apps/streamer ./apps/analytics/handlers ./internal/config ./internal/engine
+	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword REDIS_ADDR=localhost:6380 go test -v ./apps/management/handlers ./apps/evaluator/handlers ./apps/streamer ./apps/analytics/handlers ./apps/gateway/... ./internal/config ./internal/engine
 	@$(MAKE) test-db-down
 
 start-all:
@@ -64,6 +64,10 @@ run-streamer:
 run-analytics:
 	@echo "Running the analytics service..."
 	@REDIS_ADDR=localhost:6379 go run apps/analytics/main.go
+
+run-gateway:
+	@echo "Running the API Gateway..."
+	@go run apps/gateway/main.go
 
 # ====================================================================================
 #  API TESTS

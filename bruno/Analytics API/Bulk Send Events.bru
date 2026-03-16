@@ -1,0 +1,47 @@
+meta {
+  name: Bulk Send Events
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{gateway_url}}/analytics/events/bulk
+  body: json
+  auth: none
+}
+
+body:json {
+  [
+    {
+      "project_id": "{{project_id}}",
+      "environment_id": "{{env_id}}",
+      "flag_key": "new-feature",
+      "user_id": "user-123",
+      "variation_key": "true",
+      "value": true,
+      "reason": "targeting_rule_matched",
+      "context": {
+        "email": "user@example.com",
+        "country": "US"
+      },
+      "evaluated_at": 1710631200
+    }
+  ]
+}
+
+docs {
+  ## Send Evaluation Events in Bulk
+
+  This endpoint allows SDKs to report multiple evaluation events in a single batch.
+
+  ### Fields:
+  - `project_id`: UUID of the project.
+  - `environment_id`: UUID of the environment.
+  - `flag_key`: String key of the flag.
+  - `user_id`: Unique identifier for the user.
+  - `variation_key`: The variation shown to the user (e.g., "control", "true", "on").
+  - `value`: The actual value evaluated (boolean, string, number, or JSON).
+  - `reason`: Why this value was chosen (e.g., "rule_match", "default").
+  - `context`: The user attributes used for evaluation.
+  - `evaluated_at`: Unix timestamp of the evaluation.
+}

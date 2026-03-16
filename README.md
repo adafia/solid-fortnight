@@ -8,6 +8,15 @@ Solid Fortnight is a feature flagging system designed to provide dynamic control
 
 ## Currently Implemented Features
 
+### 🛠️ API Gateway Service
+
+A high-performance reverse proxy that:
+
+- Serves as the single entry point (port 8080) for all external requests.
+- Handles dynamic **Service Discovery** for Management, Evaluator, Streamer, and Analytics services.
+- Implements **Middleware Chaining** for request logging, authentication (API Key/JWT), and rate limiting.
+- Manages **Path Mapping** to simplify SDK and Admin UI integrations.
+
 ### 🛠️ Management API
 
 A RESTful API for administrative operations, including:
@@ -73,13 +82,13 @@ To get started with Solid Fortnight, follow these steps:
    - **Evaluator**: `make run-evaluator`
    - **Streamer**: `make run-streamer`
    - **Analytics**: `make run-analytics`
+   - **Gateway**: `make run-gateway`
    - **All (Docker)**: `make start-all`
-
 ## Project Structure
 
 The project is organized into several key directories:
 
-- **`apps/`**: Individual microservices (`management`, `evaluator`, `streamer`, `analytics`).
+- **`apps/`**: Individual microservices (`gateway`, `management`, `evaluator`, `streamer`, `analytics`).
 - **`deployments/`**: Stores configuration files like `config.yaml` and `docker-compose.yml`.
 - **`internal/`**: Shared internal libraries (config, evaluation engine, storage drivers, pubsub, protocol).
 - **`docs/`**: Detailed service documentation and testing strategies.

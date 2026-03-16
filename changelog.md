@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented **API Gateway** (`apps/gateway`) to serve as a unified entry point (port 8080) for all services.
+- Implemented **Middleware Chain** in the gateway with support for **Logging**, **Authentication (API Key/JWT)**, and **Rate Limiting**.
+- Added **Dynamic Service Discovery** to the gateway via environment variables.
+- Added **Path Mapping** in the gateway to route external `/api/v1` requests to internal services.
+- Added comprehensive **Unit and Integration Tests** for the API Gateway.
+- Added **Analytics API Documentation** to the Bruno collection.
+- Updated **Bruno Collection** to route all requests through the API Gateway by default.
 - Implemented **Delta Updates via SSE** in the Streamer service and SDKs (`client-js`, `server-go`) to update local cache selectively without refetching all flags on every change.
 - Implemented **Analytics Background Worker** (`apps/analytics/service/worker.go`) to consume evaluation events from Redis Streams.
 - Implemented **PostgreSQL Persistence** for evaluation events in the Analytics service using batch insertions.

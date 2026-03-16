@@ -62,5 +62,5 @@ maxItems := client.IntVariation("max-items", userContext, 10)
 | :--- | :--- | :--- | :--- |
 | `EvaluatorURL` | `string` | URL of the Evaluator service. | Required |
 | `StreamerURL` | `string` | URL of the Streamer service. | Required |
-| `EnvironmentID`| `string` | UUID of the environment. | Required |
+| `EnvironmentID` | `string` | UUID of the environment. | Required |
 | `PollInterval` | `time.Duration` | Fallback polling interval. | `5 minutes` |

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Implemented Streamer service in `apps/streamer` for real-time flag updates via Server-Sent Events (SSE).
+- Integrated Redis for Pub/Sub messaging and shared configuration.
+- Created `internal/storage/pubsub` package for publishing environment updates from the Management API.
+- Added Redis connection configuration to `internal/config` and `deployments/config.yaml`.
+- Added Dockerfiles for `streamer` and `evaluator` services.
+- Updated `docker-compose.yml` to include Redis and the new services.
+- Added `run-streamer` and `run-evaluator` commands to the `Makefile`.
+- Created a test utility script `scripts/test_sse.go` for verifying real-time flag update streams.
 - Implemented Evaluator service in `apps/evaluator` for flag evaluation.
 - Added database migrations for targeting rules and percentage-based rollouts.
 - Implemented targeting rule and rollout support in `internal/storage/store/flag_configs.go`.
@@ -27,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated `FlagsHandler` in Management API to publish environment updates on flag configuration changes.
+- Enhanced `Makefile` to include Redis and the new services in `start-db` and `stop-db`.
 - Separated project and environment management logic in `apps/management/handlers/projects.go`.
 - Updated `apps/management/main.go` to route environment requests to the new `EnvironmentsHandler`.
 - Updated `apps/management/handlers/environments_test.go` to use the new handler.

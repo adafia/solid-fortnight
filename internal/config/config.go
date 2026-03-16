@@ -25,6 +25,7 @@ type StorageConfig struct {
 	Type     string         `json:"type" yaml:"type"` // e.g., "postgres", "mysql", "memory"
 	Postgres PostgresConfig `json:"postgres,omitzero" yaml:"postgres,omitempty"`
 	MySQL    MySQLConfig    `json:"mysql,omitzero" yaml:"mysql,omitempty"`
+	Redis    RedisConfig    `json:"redis,omitzero" yaml:"redis,omitempty"`
 }
 
 // PostgresConfig holds PostgreSQL connection details.
@@ -44,6 +45,13 @@ type MySQLConfig struct {
 	User     string `json:"user" yaml:"user"`
 	Password string `json:"password" yaml:"password"`
 	DBName   string `json:"dbname" yaml:"dbname"`
+}
+
+// RedisConfig holds Redis connection details.
+type RedisConfig struct {
+	Addr     string `json:"addr" yaml:"addr"`
+	Password string `json:"password" yaml:"password"`
+	DB       int    `json:"db" yaml:"db"`
 }
 
 // ServiceConfig holds the configuration for a single service.

@@ -5,12 +5,12 @@
 # ====================================================================================
 
 start-db:
-	@echo "Starting PostgreSQL database..."
-	@docker-compose -f deployments/docker-compose.yml up -d postgres
+	@echo "Starting PostgreSQL and Redis..."
+	@docker-compose -f deployments/docker-compose.yml up -d postgres redis
 
 stop-db:
-	@echo "Stopping PostgreSQL database..."
-	@docker-compose -f deployments/docker-compose.yml stop postgres
+	@echo "Stopping PostgreSQL and Redis..."
+	@docker-compose -f deployments/docker-compose.yml stop postgres redis
 
 test-db-up:
 	@echo "Starting PostgreSQL test database..."
@@ -50,7 +50,15 @@ stop-all:
 
 run-app:
 	@echo "Running the management service..."
-	@POSTGRES_HOST=localhost POSTGRES_PORT=5432 DB_NAME=solid_fortnight DB_USER=postgres DB_PASSWORD=password go run apps/management/main.go
+	@POSTGRES_HOST=localhost POSTGRES_PORT=5432 DB_NAME=solid_fortnight DB_USER=postgres DB_PASSWORD=password REDIS_ADDR=localhost:6379 go run apps/management/main.go
+
+run-evaluator:
+	@echo "Running the evaluator service..."
+	@POSTGRES_HOST=localhost POSTGRES_PORT=5432 DB_NAME=solid_fortnight DB_USER=postgres DB_PASSWORD=password go run apps/evaluator/main.go
+
+run-streamer:
+	@echo "Running the streamer service..."
+	@REDIS_ADDR=localhost:6379 go run apps/streamer/main.go
 
 # ====================================================================================
 #  API TESTS

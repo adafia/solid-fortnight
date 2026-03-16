@@ -4,16 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/adafia/solid-fortnight/internal/storage/pubsub"
 	"github.com/adafia/solid-fortnight/internal/storage/store"
 )
 
 type FlagsHandler struct {
 	flagStore   *store.FlagStore
 	configStore *store.FlagConfigStore
+	publisher   *pubsub.Publisher
 }
 
-func NewFlagsHandler(flagStore *store.FlagStore, configStore *store.FlagConfigStore) *FlagsHandler {
-	return &FlagsHandler{flagStore: flagStore, configStore: configStore}
+func NewFlagsHandler(flagStore *store.FlagStore, configStore *store.FlagConfigStore, publisher *pubsub.Publisher) *FlagsHandler {
+	return &FlagsHandler{flagStore: flagStore, configStore: configStore, publisher: publisher}
 }
 
 func (h *FlagsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -174,6 +176,11 @@ func (h *FlagsHandler) UpsertFlagEnvironment(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Publish update
+	if h.publisher != nil {
+		h.publisher.PublishEnvironmentUpdate(r.Context(), envID)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(fe)
 }
@@ -185,9 +192,8 @@ func (h *FlagsHandler) AddVariation(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid path", http.StatusBadRequest)
 		return
 	}
-	// We need the flag_environment_id, but the path has flagID and envID.
-	// We might need to look it up first or use a different endpoint.
-	// For simplicity, let's assume the body contains the flag_environment_id or we fetch it.
+	// We need the flagID and envID from the path to publish an update for that environment
+	envID := parts[3]
 	
 	var v store.Variation
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
@@ -198,6 +204,11 @@ func (h *FlagsHandler) AddVariation(w http.ResponseWriter, r *http.Request) {
 	if err := h.configStore.AddVariation(&v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// Publish update
+	if h.publisher != nil {
+		h.publisher.PublishEnvironmentUpdate(r.Context(), envID)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

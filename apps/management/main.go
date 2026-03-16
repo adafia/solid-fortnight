@@ -9,7 +9,9 @@ import (
 	"github.com/adafia/solid-fortnight/apps/management/handlers"
 	"github.com/adafia/solid-fortnight/internal/config"
 	"github.com/adafia/solid-fortnight/internal/storage/db"
+	"github.com/adafia/solid-fortnight/internal/storage/pubsub"
 	"github.com/adafia/solid-fortnight/internal/storage/store"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -45,13 +47,21 @@ func main() {
 		log.Fatalf("Failed to run migrations from %s: %v", migrationsPath, err)
 	}
 
+	// Set up Redis
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     cfg.Storage.Redis.Addr,
+		Password: cfg.Storage.Redis.Password,
+		DB:       cfg.Storage.Redis.DB,
+	})
+	publisher := pubsub.NewPublisher(rdb)
+
 	// Set up stores
 	flagStore := store.NewFlagStore(database)
 	projectStore := store.NewProjectStore(database)
 	configStore := store.NewFlagConfigStore(database)
 
 	// Set up handlers
-	flagsHandler := handlers.NewFlagsHandler(flagStore, configStore)
+	flagsHandler := handlers.NewFlagsHandler(flagStore, configStore, publisher)
 	projectsHandler := handlers.NewProjectsHandler(projectStore)
 	environmentsHandler := handlers.NewEnvironmentsHandler(projectStore)
 

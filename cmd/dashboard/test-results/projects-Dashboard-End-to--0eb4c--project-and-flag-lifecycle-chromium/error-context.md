@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]: Solid Fortnight
+    - navigation [ref=e6]:
+      - link "Dashboard" [ref=e7] [cursor=pointer]:
+        - /url: /
+        - img [ref=e8]
+        - text: Dashboard
+      - link "Projects" [ref=e13] [cursor=pointer]:
+        - /url: /projects
+        - img [ref=e14]
+        - text: Projects
+      - link "Global Flags" [ref=e17] [cursor=pointer]:
+        - /url: /flags
+        - img [ref=e18]
+        - text: Global Flags
+      - link "Settings" [ref=e20] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e21]
+        - text: Settings
+  - main [ref=e24]:
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - heading "Projects" [level=1] [ref=e27]
+        - button "New Project" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+          - text: New Project
+      - generic [ref=e30]: Failed to load projects. Is the gateway running?
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - heading "Create New Project" [level=2] [ref=e34]
+          - button [ref=e35] [cursor=pointer]:
+            - img [ref=e36]
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]: Project Name
+            - textbox "Project Name" [ref=e42]:
+              - /placeholder: e.g. Mobile App
+              - text: Test Project 114
+          - generic [ref=e43]:
+            - generic [ref=e44]: Description
+            - textbox "Description" [ref=e45]:
+              - /placeholder: What is this project for?
+              - text: Created by E2E test
+          - generic [ref=e46]:
+            - button "Cancel" [ref=e47] [cursor=pointer]
+            - button "Create Project" [active] [ref=e48] [cursor=pointer]
+      - paragraph [ref=e51]: No projects found. Create your first project to get started!
+```

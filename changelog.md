@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added comprehensive **Unit and Integration Tests** for the API Gateway.
 - Added **Analytics API Documentation** to the Bruno collection.
 - Updated **Bruno Collection** to route all requests through the API Gateway by default.
+- Created a comprehensive **Getting Started Guide** (`docs/getting-started.md`) for new users.
 - Implemented **Delta Updates via SSE** in the Streamer service and SDKs (`client-js`, `server-go`) to update local cache selectively without refetching all flags on every change.
 - Implemented **Analytics Background Worker** (`apps/analytics/service/worker.go`) to consume evaluation events from Redis Streams.
 - Implemented **PostgreSQL Persistence** for evaluation events in the Analytics service using batch insertions.

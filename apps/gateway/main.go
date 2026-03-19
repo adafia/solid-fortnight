@@ -50,13 +50,15 @@ func NewGatewayHandler(cfg *config.Config) http.Handler {
 
 	// Reverse proxies with target parsing done once
 	// /api/v1/management/projects/ -> /projects/
-	mux.Handle("/api/v1/management/", middleware.Chain(createProxyHandler(targets["management"], "/api/v1/management", ""), middleware.Logger, middleware.Auth, middleware.RateLimit))
+	// Chain wraps from right to left, so the LAST argument is the OUTERMOST middleware.
+	// CORS must be outermost to handle OPTIONS pre-flight requests before anything else.
+	mux.Handle("/api/v1/management/", middleware.Chain(createProxyHandler(targets["management"], "/api/v1/management", ""), middleware.Logger, middleware.Auth, middleware.RateLimit, middleware.CORS))
 	// /api/v1/evaluate -> /api/v1/evaluate
-	mux.Handle("/api/v1/evaluate", middleware.Chain(createProxyHandler(targets["evaluator"], "", ""), middleware.Logger, middleware.Auth, middleware.RateLimit))
+	mux.Handle("/api/v1/evaluate", middleware.Chain(createProxyHandler(targets["evaluator"], "", ""), middleware.Logger, middleware.Auth, middleware.RateLimit, middleware.CORS))
 	// /api/v1/stream -> /stream
-	mux.Handle("/api/v1/stream", middleware.Chain(createProxyHandler(targets["streamer"], "/api/v1", ""), middleware.Logger, middleware.Auth, middleware.RateLimit))
+	mux.Handle("/api/v1/stream", middleware.Chain(createProxyHandler(targets["streamer"], "/api/v1", ""), middleware.Logger, middleware.Auth, middleware.RateLimit, middleware.CORS))
 	// /api/v1/analytics/events/ -> /api/v1/events/
-	mux.Handle("/api/v1/analytics/", middleware.Chain(createProxyHandler(targets["analytics"], "/analytics", ""), middleware.Logger, middleware.Auth, middleware.RateLimit))
+	mux.Handle("/api/v1/analytics/", middleware.Chain(createProxyHandler(targets["analytics"], "/analytics", ""), middleware.Logger, middleware.Auth, middleware.RateLimit, middleware.CORS))
 
 	return mux
 }
@@ -69,7 +71,7 @@ func getServiceURL(serviceName, defaultHost string, port int) string {
 	return fmt.Sprintf("http://%s:%d", host, port)
 }
 
-func createProxyHandler(target string, prefixToReplace, replacement string) http.HandlerFunc {
+func createProxyHandler(target string, prefixToReplace, replacement string) http.Handler {
 	u, err := url.Parse(target)
 	if err != nil {
 		log.Fatalf("Failed to parse target URL %s: %v", target, err)
@@ -87,8 +89,8 @@ func createProxyHandler(target string, prefixToReplace, replacement string) http
 		req.Host = u.Host
 	}
 
-	return func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Proxying request: %s %s -> %s", r.Method, r.URL.Path, target)
 		proxy.ServeHTTP(w, r)
-	}
+	})
 }

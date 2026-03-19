@@ -28,7 +28,19 @@ services:
       retries: 5
 
   management:
-...
+    build:
+      context: ..
+      dockerfile: apps/management/Dockerfile
+    restart: always
+    ports:
+      - "8083:8083"
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME: ${DB_NAME:-solid_fortnight}
+      REDIS_ADDR: ${REDIS_ADDR:-redis:6379}
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,8 +97,10 @@ services:
       context: ..
       dockerfile: apps/gateway/Dockerfile
     restart: always
-    ports:
-      - "8080:8080"
+    # Removing public port mapping to ensure all traffic goes through Caddy (Dashboard)
+    # for consistent single-origin (no CORS) testing.
+    # ports:
+    #   - "8080:8080"
     environment:
       MANAGEMENT_HOST: management
       EVALUATOR_HOST: evaluator
@@ -97,6 +111,16 @@ services:
       - evaluator
       - streamer
       - analytics
+
+  dashboard:
+    build:
+      context: ../cmd/dashboard
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - gateway
 
 volumes:
   postgres_data:

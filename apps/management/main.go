@@ -67,15 +67,15 @@ func main() {
 
 	// Set up router
 	mux := http.NewServeMux()
-	mux.Handle("/flags/", flagsHandler)
-	mux.HandleFunc("/projects/", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/flags/", logRequest(flagsHandler))
+	mux.Handle("/projects/", logRequest(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		parts := handlers.SplitPath(r.URL.Path)
 		if len(parts) >= 3 && parts[2] == "environments" {
 			environmentsHandler.ServeHTTP(w, r)
 			return
 		}
 		projectsHandler.ServeHTTP(w, r)
-	})
+	})))
 
 	// Start server
 	port := cfg.Services["management"].Port
@@ -84,4 +84,11 @@ func main() {
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
+}
+
+func logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Request: %s %s", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
 }

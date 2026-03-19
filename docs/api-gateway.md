@@ -32,9 +32,9 @@ The Gateway maps incoming requests under the `/api/v1` prefix to the correspondi
 
 Every request passing through the gateway is processed by a chain of middlewares:
 
-1.  **Logger**: Records request method, path, and remote address.
-2.  **Auth**: Validates `X-API-Key` or `Authorization: Bearer <token>` headers.
-3.  **RateLimit**: (Placeholder) Prevents abuse by limiting request frequency.
+1. **Logger**: Records request method, path, and remote address.
+2. **Auth**: Validates `X-API-Key` or `Authorization: Bearer <token>` headers.
+3. **RateLimit**: (Placeholder) Prevents abuse by limiting request frequency.
 
 ## 5. Configuration
 

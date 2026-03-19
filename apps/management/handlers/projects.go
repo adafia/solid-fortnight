@@ -46,7 +46,14 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 func (h *ProjectsHandler) GetProject(w http.ResponseWriter, r *http.Request) {
 	parts := SplitPath(r.URL.Path)
 	if len(parts) < 2 {
-		http.Error(w, "Invalid path", http.StatusBadRequest)
+		// List projects if no ID provided
+		projects, err := h.projectStore.ListProjects()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(projects)
 		return
 	}
 	id := parts[1]

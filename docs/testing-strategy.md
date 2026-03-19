@@ -1,80 +1,67 @@
 # Testing Strategy
 
-This document outlines the testing strategy for the `solid-fortnight` project, ensuring reliability across the management, evaluator, streamer, and analytics services.
+This document outlines the testing strategy for the `solid-fortnight` project, ensuring reliability across the gateway, management, evaluator, streamer, and analytics services, as well as the admin dashboard.
 
-## 1. Overview
+## 1. The Testing Pyramid
 
-The project uses a multi-layered testing approach to ensure reliability and maintainability:
+We follow a layered testing approach to balance speed and confidence:
 
-* **Unit Tests:** Test individual components (e.g., `internal/engine`, configuration loading, utility functions) in isolation.
-* **Integration Tests:** Verify that different parts of the system work together, specifically handlers and storage layers interacting with real PostgreSQL and Redis instances.
-* **Benchmarks:** Measure and ensure the performance of critical components like the flag evaluation engine.
+| Layer | Tool | Scope | Speed |
+| :--- | :--- | :--- | :--- |
+| **Unit Tests (Backend)** | Go `testing` | Engine logic, config, utility functions. | Fast (< 1s) |
+| **Unit Tests (UI)** | Vitest + RTL | Dashboard components, modal logic, routing. | Fast (< 2s) |
+| **Integration Tests** | Go `testing` + Docker | API handlers interacting with real DB/Redis. | Medium (~5s) |
+| **End-to-End (E2E)** | Playwright + Docker | Full user flows through Gateway & UI. | Slow (> 30s) |
 
-## 2. Environment Isolation
+## 2. Layer Details
 
-To prevent tests from interfering with development data, a dedicated test environment is used via Docker Compose.
+### UI Component Testing (Vitest)
 
-### Development Environment
+Used for the Admin Dashboard to verify UI behavior without a backend.
 
-* **PostgreSQL:** `localhost:5432` (DB: `solid_fortnight`)
-* **Redis:** `localhost:6379`
-* **Command:** `make start-db`
-
-### Testing Environment
-
-* **PostgreSQL:** `localhost:5433` (DB: `solid_fortnight_test`)
-* **Redis:** `localhost:6380`
-* **Command:** `make test`
-
-## 3. Testing Patterns
+- **Mocking**: Global `fetch` is mocked to simulate API Gateway responses.
+- **Location**: `cmd/dashboard/src/**/*.test.tsx`.
+- **Command**: `cd cmd/dashboard && bun run test`.
 
 ### Integration Testing (Synchronous)
 
-Used for the Management API. These tests ensure that HTTP requests correctly modify the PostgreSQL state.
+Used for the Management API and Gateway. These tests ensure that HTTP requests correctly modify the PostgreSQL state or proxy correctly to internal services.
 
-* **Workflow:** Setup DB -> Run Migration -> Execute Request -> Verify DB State -> Truncate Tables.
+- **Infrastructure**: Real PostgreSQL/Redis containers via `make test-db-up`.
+- **Location**: `apps/*/handlers/*_test.go`.
 
-### Asynchronous Testing (Worker Pattern)
+### Browser-based E2E Testing (Playwright)
 
-Used for the Analytics service. Testing the flow from the Ingestion API to Redis Streams and finally to PostgreSQL.
+The final verification layer that tests the real integrated system.
 
-* **Pattern:** "Poll with Timeout". The test produces an event and then polls the database in a loop (with a timeout) until the expected record appears.
-* **Example:** See `apps/analytics/handlers/analytics_integration_test.go`.
+- **Environment**: Full Docker Compose stack (`make start-all`).
+- **Location**: `cmd/dashboard/tests/e2e/*.spec.ts`.
+- **Command**: `make test-e2e`.
 
-### Performance Benchmarking
+## 3. Mocking Strategy
 
-Critical for the `internal/engine` package to ensure flag evaluation remains in the sub-millisecond range.
+- **Backend**: Prefer real infrastructure (Postgres/Redis) for Go tests.
+- **Gateway**: Use `httptest.NewServer` to mock internal services when testing proxy logic.
+- **UI**: Mock `fetch` in Vitest to test error states and complex data scenarios without starting Go services.
 
-* **Command:** `go test -bench=. ./internal/engine`
+## 4. Execution Guide
 
-## 4. Mocking Strategy
-
-* **Prefer Real Infrastructure:** For integration tests, always use the real PostgreSQL/Redis containers provided by the test environment.
-* **Use Mocks for Isolation:** Use interfaces and mocks (e.g., `mockProcessor` in Analytics) when testing high-level handlers to avoid heavy setup for simple logic checks.
-
-## 5. Running Tests
-
-### All Tests
+### Fast Feedback Loop (Recommended for Development)
 
 ```bash
+# 1. Test Backend Logic
+go test ./internal/engine/... ./internal/config/...
+
+# 2. Test UI Logic
+cd cmd/dashboard && bun run test
+```
+
+### Full Verification (Before Commit)
+
+```bash
+# 1. Run all Backend Integration Tests
 make test
+
+# 2. Run Full Stack E2E
+make test-e2e
 ```
-
-### Specific Service Tests
-
-```bash
-# Start test containers
-make test-db-up
-
-# Run specific tests (e.g., Evaluator)
-go test -v ./apps/evaluator/handlers
-
-# Run benchmarks
-go test -bench=. ./internal/engine
-```
-
-## 6. Adding New Tests
-
-* **Unit Tests:** Create `*_test.go` files in the same package.
-* **Integration Tests:** Use the `TestMain` pattern or ensure containers are up.
-* **Cleanup:** Always use `truncateTables()` or unique identifiers (UUIDs) for test data to avoid cross-test interference.

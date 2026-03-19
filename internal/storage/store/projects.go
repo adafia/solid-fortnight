@@ -66,6 +66,37 @@ func (s *ProjectStore) GetProject(id string) (*Project, error) {
 	return project, nil
 }
 
+// ListProjects retrieves all projects from the database.
+func (s *ProjectStore) ListProjects() ([]Project, error) {
+	query := `
+		SELECT id, name, description, created_at, updated_at
+		FROM projects
+		ORDER BY created_at DESC`
+	
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projects []Project
+	for rows.Next() {
+		var p Project
+		err := rows.Scan(
+			&p.ID,
+			&p.Name,
+			&p.Description,
+			&p.CreatedAt,
+			&p.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, p)
+	}
+	return projects, nil
+}
+
 // CreateEnvironment creates a new environment in the database.
 func (s *ProjectStore) CreateEnvironment(env *Environment) error {
 	query := `

@@ -64,7 +64,9 @@ A high-throughput event ingestion and processing service that:
 
 ## Project Setup
 
-To get started with Solid Fortnight, follow these steps:
+To get started with Solid Fortnight, follow the [Getting Started Guide](docs/getting-started.md) for a step-by-step tutorial.
+
+Alternatively, follow these quick steps:
 
 1. **Prerequisites**: Ensure you have Go (1.25.0+), Docker, and Docker Compose installed.
 2. **Environment Setup**:
@@ -92,6 +94,20 @@ The project is organized into several key directories:
 - **`deployments/`**: Stores configuration files like `config.yaml` and `docker-compose.yml`.
 - **`internal/`**: Shared internal libraries (config, evaluation engine, storage drivers, pubsub, protocol).
 - **`docs/`**: Detailed service documentation and testing strategies.
+
+## Testing Strategy
+
+This project follows a **Testing Pyramid** approach for high confidence and fast feedback.
+
+### 1. Fast Feedback (Unit Tests)
+- **Backend**: `go test ./internal/...` - Tests core logic (sub-second).
+- **UI**: `make test-ui` - Fast Vitest tests for the Dashboard (under 2s).
+
+### 2. Integration & E2E
+- **Integration**: `make test` - Tests Go handlers with a real Database/Redis.
+- **Full-stack E2E**: `make test-e2e` - Playwright tests running against the full Docker stack.
+
+For more details, see the [Testing Strategy](docs/testing-strategy.md).
 
 ## Running the Application
 

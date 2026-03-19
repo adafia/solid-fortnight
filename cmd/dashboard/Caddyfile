@@ -1,0 +1,14 @@
+:80 {
+    # Serve static files from the build output
+    root * /usr/share/caddy
+    file_server
+
+    # Proxy API requests to the gateway service
+    # 'gateway' is the service name in docker-compose
+    handle_path /api/* {
+        reverse_proxy gateway:8080
+    }
+
+    # Fallback to index.html for SPA routing
+    try_files {path} /index.html
+}

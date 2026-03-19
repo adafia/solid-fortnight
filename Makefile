@@ -1,4 +1,18 @@
-.PHONY: all start-db stop-db test-db-up test-db-down test start-all stop-all run-app test-api-create test-api-get test-api-update test-api-delete
+.PHONY: all start-db stop-db test-db-up test-db-down test start-all stop-all run-app test-api-create test-api-get test-api-update test-api-delete setup-colima
+
+# ====================================================================================
+#  SETUP
+# ====================================================================================
+
+setup-colima:
+	@echo "Configuring Colima with 4 CPUs and 8GiB RAM for better build performance..."
+	@colima stop || true
+	@colima start --cpu 4 --memory 8
+
+clean-docker:
+	@echo "Cleaning up unused Docker resources..."
+	@docker system prune -af
+	@docker builder prune -af
 
 # ====================================================================================
 #  DATABASE
@@ -37,9 +51,20 @@ test: test-db-up
 	@POSTGRES_HOST=localhost POSTGRES_PORT=5433 DB_NAME=solid_fortnight_test DB_USER=testuser DB_PASSWORD=testpassword REDIS_ADDR=localhost:6380 go test -v ./apps/management/handlers ./apps/evaluator/handlers ./apps/streamer ./apps/analytics/handlers ./apps/gateway/... ./internal/config ./internal/engine
 	@$(MAKE) test-db-down
 
+test-e2e:
+	@echo "Running E2E integration tests..."
+	@$(MAKE) start-all
+	@echo "Waiting for services to be ready..."
+	@sleep 10
+	@cd cmd/dashboard && bunx playwright test
+
+test-ui:
+	@echo "Running fast UI unit tests..."
+	@cd cmd/dashboard && bun run test --run
+
 start-all:
 	@echo "Starting the entire application with Docker Compose..."
-	@docker-compose -f deployments/docker-compose.yml up -d --build
+	@docker-compose -f deployments/docker-compose.yml up -d
 
 stop-all:
 	@echo "Stopping the entire application with Docker Compose..."
@@ -68,6 +93,10 @@ run-analytics:
 run-gateway:
 	@echo "Running the API Gateway..."
 	@go run apps/gateway/main.go
+
+start-dashboard:
+	@echo "Starting the Admin Dashboard..."
+	@cd cmd/dashboard && bun run dev
 
 # ====================================================================================
 #  API TESTS

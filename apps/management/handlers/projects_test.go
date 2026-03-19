@@ -57,4 +57,22 @@ func TestCRUD_Projects(t *testing.T) {
 			t.Errorf("expected project ID %s; got %s", createdProject.ID, fetchedProject.ID)
 		}
 	})
+
+	// List
+	t.Run("ListProjects", func(t *testing.T) {
+		req, _ := http.NewRequest(http.MethodGet, "/projects", nil)
+		rr := httptest.NewRecorder()
+
+		projectsHandler.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Errorf("expected status %d; got %d", http.StatusOK, rr.Code)
+		}
+
+		var projects []store.Project
+		json.Unmarshal(rr.Body.Bytes(), &projects)
+		if len(projects) == 0 {
+			t.Error("expected projects list to be non-empty")
+		}
+	})
 }

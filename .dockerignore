@@ -1,2 +1,12 @@
+.git
 .env
-docs/_*
+node_modules
+**/node_modules
+dist
+**/dist
+.next
+**/out
+.vscode
+.idea
+*.log
+coverage
